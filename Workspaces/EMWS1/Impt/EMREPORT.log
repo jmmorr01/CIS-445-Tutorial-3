@@ -1,0 +1,60 @@
+MPRINT(EM_DIAGRAM):    data _null_;
+MPRINT(EM_DIAGRAM):   call symput('NLDATE', strip(put(date(), NLDATE.)));
+MPRINT(EM_DIAGRAM):   call symput('NLTIME', strip(put(datetime(), NLTIME.)));
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   data _null_;
+MPRINT(EM_DIAGRAM):   nldate= sasmsg("sashelp.dmine", "log_date_note", 'N', "November 13, 2018" );
+MPRINT(EM_DIAGRAM):   nltime= sasmsg("sashelp.dmine", "log_time_note", 'N', "10:19:55" );
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   put "* Report Log";
+MPRINT(EM_DIAGRAM):   put nldate;
+MPRINT(EM_DIAGRAM):   put nltime;
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   run;
+*------------------------------------------------------------*
+* Report Log
+Date:                November 13, 2018
+Time:                10:19:55
+*------------------------------------------------------------*
+MPRINT(EM_DIAGRAM):    filename O097CUBL "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS1\Impt\EMREPORT.out" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):   proc printto print=O097CUBL new;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    data EMWS1.Impt_RESULT;
+MPRINT(EM_DIAGRAM):   label NAME = "Variable Name" METHOD = "Impute Method" IMPUTED = "Imputed Variable" INDICATOR = "Indicator Variable" VALUE = "Impute Value" ROLE = "Role" LEVEL = "Measurement Level" LABEL = "Label" TRAIN = "Number of Missing for 
+TRAIN";
+MPRINT(EM_DIAGRAM):   set EMWS1.Impt_META(where=(IMPUTED ne '') keep=NAME METHOD IMP VALUE ROLE NMISS LEVEL LABEL rename=(IMP=IMPUTED NMISS=TRAIN)) end=eof;
+MPRINT(EM_DIAGRAM):   if eof then call symput('_nimpute', '1');
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    proc print data=EMWS1.Impt_RESULT(obs=500) label noobs;
+MPRINT(EM_DIAGRAM):   title9 "Imputation Summary";
+MPRINT(EM_DIAGRAM):   title10 "Number Of Observations";
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    proc freq data=EMWS1.Impt_RESULT noprint;
+MPRINT(EM_DIAGRAM):   table train /out=WORK.ImptSUMMARY nocum;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   proc sort data=WORK.ImptSUMMARY NOTHREADS;
+MPRINT(EM_DIAGRAM):   by descending TRAIN;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   proc print data=WORK.ImptSUMMARY(obs=100) label;
+MPRINT(EM_DIAGRAM):   label COUNT = "Number of Variables" PERCENT = "Percent of Variables";
+MPRINT(EM_DIAGRAM):   title9 ' ';
+MPRINT(EM_DIAGRAM):   title10 "Variable Distribution Training Data";
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    data EMWS1.Impt_EMSCOREVAR;
+MPRINT(EM_DIAGRAM):   length Name $32 formula $70 file $200;
+MPRINT(EM_DIAGRAM):   keep NAME Formula file;
+MPRINT(EM_DIAGRAM):   set EMWS1.Impt_META end=eof;
+MPRINT(EM_DIAGRAM):   *set EMWS1.Impt_RESULT end=eof;
+MPRINT(EM_DIAGRAM):   if M ne '' then do;
+MPRINT(EM_DIAGRAM):   NAME= M;
+MPRINT(EM_DIAGRAM):   file="IMPUTECODE\"!!strip(NAME)!!'.sas';
+MPRINT(EM_DIAGRAM):   output;
+MPRINT(EM_DIAGRAM):   end;
+MPRINT(EM_DIAGRAM):   if IMP ne '' then do;
+MPRINT(EM_DIAGRAM):   NAME= IMP;
+MPRINT(EM_DIAGRAM):   file="IMPUTECODE\"!!strip(NAME)!!'.sas';
+MPRINT(EM_DIAGRAM):   output;
+MPRINT(EM_DIAGRAM):   end;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    proc printto;
+MPRINT(EM_DIAGRAM):   run;

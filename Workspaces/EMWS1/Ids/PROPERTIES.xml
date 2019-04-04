@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?><_ROOT_  DataSource="allbaseballdata" Scope="LOCAL" Role="RAW" Library="SAMPSIO" Table="DMABASE"
+ NCols="23" NObs="322" NBytes="132096" Segment="" DataSourceRole="RAW" OutputType="VIEW"
+ ForceRun="N" ComputeStatistics="N" DataSelection="DATASOURCE" NewTable="" MetaAdvisor="BASIC"
+ ApplyIntervalLevelLowerLimit="Y" IntervalLowerLimit="20" ApplyMaxPercentMissing="Y"
+ MaxPercentMissing="50" ApplyMaxClassLevels="Y" MaxClassLevels="20" IdentifyEmptyColumns="Y"
+ VariableValidation="STRICT" NewVariableRole="REJECT" DropMapVariables="Y" DsId="allbaseballdata"
+ DsSampleName="" DsSampleSizeType="" DsSampleSize="" DsCreatedBy="jmmorr01" DsCreateDate="1857723490.8"
+ DsModifiedBy="jmmorr01" DsModifyDate="1857723490.9" DsScope="LOCAL" Sample="D" SampleSizeType="PERCENT"
+ SampleSizePercent="20" SampleSizeObs="10000" DBPassThrough="Y" RunAction="Train"
+ Component="DataSource" RawCreateTime="1857723499.3" CreateTime="13NOV2018:10:18:19"
+ Description="All: Baseball Data" Data="SAMPSIO.DMABASE" CMeta="WORK.M3S3E1VU" RunId="b1d6b6cd-8efe-40bf-a6e3-c5e4ccd964f8"
+>
+<VARIABLEPROPERTIES/>
+<FILEPROPERTIES/>
+</_ROOT_>

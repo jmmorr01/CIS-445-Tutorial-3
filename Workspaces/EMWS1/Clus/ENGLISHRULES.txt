@@ -1,0 +1,112 @@
+*------------------------------------------------------------*
+ Node = 8
+*------------------------------------------------------------*
+if Hits in 1986 < 103.5 or MISSING
+AND Career times at bat < 3791 or MISSING
+AND Career Walks < 278.5 or MISSING
+then 
+ Tree Node Identifier   = 8
+ Number of Observations = 122
+ Predicted: _SEGMENT_=1  = 0.98
+ Predicted: _SEGMENT_=3  = 0.00
+ Predicted: _SEGMENT_=2  = 0.02
+ Predicted: _SEGMENT_=4  = 0.00
+ 
+*------------------------------------------------------------*
+ Node = 9
+*------------------------------------------------------------*
+if Hits in 1986 < 103.5 or MISSING
+AND Career times at bat < 3791 or MISSING
+AND Career Walks >= 278.5
+then 
+ Tree Node Identifier   = 9
+ Number of Observations = 5
+ Predicted: _SEGMENT_=1  = 0.20
+ Predicted: _SEGMENT_=3  = 0.40
+ Predicted: _SEGMENT_=2  = 0.40
+ Predicted: _SEGMENT_=4  = 0.00
+ 
+*------------------------------------------------------------*
+ Node = 10
+*------------------------------------------------------------*
+if Hits in 1986 >= 103.5
+AND Career times at bat < 3791 or MISSING
+AND Career RBIs < 77.5
+then 
+ Tree Node Identifier   = 10
+ Number of Observations = 8
+ Predicted: _SEGMENT_=1  = 0.75
+ Predicted: _SEGMENT_=3  = 0.00
+ Predicted: _SEGMENT_=2  = 0.25
+ Predicted: _SEGMENT_=4  = 0.00
+ 
+*------------------------------------------------------------*
+ Node = 11
+*------------------------------------------------------------*
+if Hits in 1986 >= 103.5
+AND Career times at bat < 3791 or MISSING
+AND Career RBIs >= 77.5 or MISSING
+then 
+ Tree Node Identifier   = 11
+ Number of Observations = 95
+ Predicted: _SEGMENT_=1  = 0.04
+ Predicted: _SEGMENT_=3  = 0.01
+ Predicted: _SEGMENT_=2  = 0.95
+ Predicted: _SEGMENT_=4  = 0.00
+ 
+*------------------------------------------------------------*
+ Node = 12
+*------------------------------------------------------------*
+if Home Runs in 1986 < 15.5 or MISSING
+AND Hits in 1986 < 113.5 or MISSING
+AND Career times at bat >= 3791
+then 
+ Tree Node Identifier   = 12
+ Number of Observations = 45
+ Predicted: _SEGMENT_=1  = 0.00
+ Predicted: _SEGMENT_=3  = 0.98
+ Predicted: _SEGMENT_=2  = 0.00
+ Predicted: _SEGMENT_=4  = 0.02
+ 
+*------------------------------------------------------------*
+ Node = 13
+*------------------------------------------------------------*
+if Home Runs in 1986 >= 15.5
+AND Hits in 1986 < 113.5 or MISSING
+AND Career times at bat >= 3791
+then 
+ Tree Node Identifier   = 13
+ Number of Observations = 8
+ Predicted: _SEGMENT_=1  = 0.00
+ Predicted: _SEGMENT_=3  = 0.38
+ Predicted: _SEGMENT_=2  = 0.00
+ Predicted: _SEGMENT_=4  = 0.63
+ 
+*------------------------------------------------------------*
+ Node = 14
+*------------------------------------------------------------*
+if Hits in 1986 >= 113.5
+AND Career times at bat >= 3791
+AND Career Home Runs < 117
+then 
+ Tree Node Identifier   = 14
+ Number of Observations = 13
+ Predicted: _SEGMENT_=1  = 0.00
+ Predicted: _SEGMENT_=3  = 0.08
+ Predicted: _SEGMENT_=2  = 0.85
+ Predicted: _SEGMENT_=4  = 0.08
+ 
+*------------------------------------------------------------*
+ Node = 15
+*------------------------------------------------------------*
+if Hits in 1986 >= 113.5
+AND Career times at bat >= 3791
+AND Career Home Runs >= 117 or MISSING
+then 
+ Tree Node Identifier   = 15
+ Number of Observations = 26
+ Predicted: _SEGMENT_=1  = 0.00
+ Predicted: _SEGMENT_=3  = 0.00
+ Predicted: _SEGMENT_=2  = 0.00
+ Predicted: _SEGMENT_=4  = 1.00
+ 

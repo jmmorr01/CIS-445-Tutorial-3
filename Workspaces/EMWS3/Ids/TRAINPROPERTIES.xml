@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?><_ROOT_  DataSource="webpath" Scope="LOCAL" Role="TRANSACTION" Library="SAMPSIO" Table="WEBPATH"
+ NCols="4" NObs="4979" NBytes="." Segment="" DataSourceRole="TRANSACTION" OutputType="VIEW"
+ ForceRun="N" ComputeStatistics="N" DataSelection="DATASOURCE" NewTable="" MetaAdvisor="BASIC"
+ ApplyIntervalLevelLowerLimit="Y" IntervalLowerLimit="20" ApplyMaxPercentMissing="Y"
+ MaxPercentMissing="50" ApplyMaxClassLevels="Y" MaxClassLevels="20" IdentifyEmptyColumns="Y"
+ VariableValidation="STRICT" NewVariableRole="REJECT" DropMapVariables="Y" DsId="webpath"
+ DsSampleName="" DsSampleSizeType="" DsSampleSize="" DsCreatedBy="jmmorr01" DsCreateDate="1857724222.3"
+ DsModifiedBy="jmmorr01" DsModifyDate="1857724222.5" DsScope="LOCAL" Sample="D" SampleSizeType="PERCENT"
+ SampleSizePercent="20" SampleSizeObs="10000" DBPassThrough="Y" RunAction="Train"
+ Component="DataSource" RawCreateTime="1857724226.7" CreateTime="13NOV2018:10:30:27"
+ Description="" Data="SAMPSIO.WEBPATH" CMeta="WORK.M1FYFW6P" RunId="f43dfb61-d840-4841-b5b6-1c7977ea9b3a"
+ RawLastTimeRun="1857724278.2" RawRunTime="6.4199998379" LastTimeRun="13NOV2018:10:31:18"
+ RunTime="0 Hr. 0 Min. 6.42 Sec.">
+<VARIABLEPROPERTIES/>
+<FILEPROPERTIES/>
+</_ROOT_>

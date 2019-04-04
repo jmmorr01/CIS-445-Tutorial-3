@@ -1,0 +1,52 @@
+*------------------------------------------------------------*
+User:                jmmorr01
+Date:                November 13, 2018
+Time:                10:19:56
+*------------------------------------------------------------*
+* Training Output
+*------------------------------------------------------------*
+ 
+ 
+ 
+ 
+Variable Summary
+ 
+            Measurement    Frequency
+Role           Level         Count
+ 
+INPUT        INTERVAL          17
+REJECTED     BINARY             2
+REJECTED     INTERVAL           1
+REJECTED     NOMINAL            2
+
+
+*------------------------------------------------------------*
+* Score Output
+*------------------------------------------------------------*
+
+
+*------------------------------------------------------------*
+* Report Output
+*------------------------------------------------------------*
+ 
+ 
+ 
+Imputation Summary
+Number Of Observations
+ 
+                                                                                       Number of
+Variable    Impute      Imputed        Impute             Measurement                   Missing
+  Name      Method      Variable       Value     Role        Level         Label       for TRAIN
+ 
+logsalar    MEDIAN    IMP_logsalar    6.05209    INPUT     INTERVAL      Log Salary           59
+ 
+ 
+ 
+ 
+Variable Distribution Training Data
+ 
+       Number of
+        Missing     Number of    Percent of
+Obs    for TRAIN    Variables     Variables
+ 
+ 1            59        1            100

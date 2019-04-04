@@ -1,0 +1,2077 @@
+MPRINT(EM_DIAGRAM):    data _null_;
+MPRINT(EM_DIAGRAM):   call symput('NLDATE', strip(put(date(), NLDATE.)));
+MPRINT(EM_DIAGRAM):   call symput('NLTIME', strip(put(datetime(), NLTIME.)));
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   data _null_;
+MPRINT(EM_DIAGRAM):   nldate= sasmsg("sashelp.dmine", "log_date_note", 'N', "November 13, 2018" );
+MPRINT(EM_DIAGRAM):   nltime= sasmsg("sashelp.dmine", "log_time_note", 'N', "10:31:33" );
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   put "* Score Log";
+MPRINT(EM_DIAGRAM):   put nldate;
+MPRINT(EM_DIAGRAM):   put nltime;
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   run;
+*------------------------------------------------------------*
+* Score Log
+Date:                November 13, 2018
+Time:                10:31:33
+*------------------------------------------------------------*
+MPRINT(EM_DIAGRAM):    filename O3AZV4_9 "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMSCORE.out" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):   proc printto print=O3AZV4_9 new;
+MPRINT(EM_DIAGRAM):   run;
+29809      %let EMEXCEPTIONSTRING=;
+29810      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):    *------------------------------------------------------------*;
+29811      * SCORE: Link;
+MPRINT(EM_DIAGRAM):   * SCORE: Link;
+29812      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+29813      %let EM_ACTION = SCORE;
+29814      %let syscc = 0;
+29815      %MACRO EM_LINKANALYSIS_MAIN;
+29816        filename temp catalog 'sashelp.emexpl.link_macros.source';
+29817            %include temp;
+29818        filename temp;
+29819      
+29820         %if %upcase(&EM_ACTION) = CREATE %then %do;
+29821          filename temp catalog 'sashelp.emexpl.link_create.source';
+29822            %include temp;
+29823          filename temp;
+29824          %EM_LINKANALYSIS_CREATE;
+29825         %end;
+29826      
+29827         %if %upcase(&EM_ACTION) = TRAIN %then %do;
+29828          filename temp catalog 'sashelp.emexpl.link_train.source';
+29829             %include temp;
+29830            filename temp;
+29831          %EM_LINKANALYSIS_TRAIN;
+29832        %end;
+29833      
+29834         %if %upcase(&EM_ACTION) = SCORE %then %do;
+29835          filename temp catalog 'sashelp.emexpl.link_score.source';
+29836          %include temp;
+29837          filename temp;
+29838          %EM_LINKANALYSIS_SCORE;
+29839        %end;
+29840      
+29841         %if %upcase(&EM_ACTION) = REPORT %then %do;
+29842          filename temp catalog 'sashelp.emexpl.link_report.source';
+29843          %include temp;
+29844          filename temp;
+29845          %EM_LINKANALYSIS_REPORT;
+29846        %end ;
+29847      %MEND EM_LINKANALYSIS_MAIN;
+29848      
+29849      %EM_LINKANALYSIS_MAIN;
+MPRINT(EM_DIAGRAM):    
+MPRINT(EM_LINKANALYSIS_MAIN):   filename temp catalog 'sashelp.emexpl.link_macros.source';
+NOTE: %INCLUDE (level 1) file TEMP is file SASHELP.EMEXPL.LINK_MACROS.SOURCE.
+29850     +%macro em_linkan_nobs(ds);
+29851     +  %let dsID = %sysfunc(open(&ds));
+29852     +  %if &dsID %then %do;
+29853     +    %let nObs = %sysfunc(attrn(&dsID,nlobsf));
+29854     +    %let rc   = %sysfunc(close(&dsID));
+29855     +  %end;
+29856     +  &nObs
+29857     +%mend em_linkan_nobs;
+29860     +%macro em_linkan_appendfiles(fileref1, fileref2);/*append fileref2 to fileref1;*/
+29861     +     data _null_;
+29862     +       length c $256;
+29863     +       fid1=fopen("&fileref1",'A');
+29864     +       fid2=fopen("&fileref2",'I');
+29865     +       cval = finfo(fid2,'lrecl');
+29866     +       put cval= fid1= fid2=;
+29867     +       if (fid2 > 0) then
+29868     +         do while(fread(fid2)=0);
+29869     +           rc = fget(fid2,c,256);
+29870     +           _msg_=sysmsg();
+29871     +           /* put rc= c= _msg_=; */
+29872     +           rc = fput(fid1,strip(c));
+29873     +           rc = fwrite(fid1);
+29874     +         end;
+29875     +         _msg_=sysmsg();
+29876     +         put _msg_=;
+29877     +       rc = fclose(fid1);
+29878     +       rc = fclose(fid2);
+29879     +     run;
+29880     +%mend em_linkan_appendfiles;
+29882     +%macro em_linkan_getnodesfromlinks(nodes=,links=,lookupnodes=, samegroup=Y);
+29883     +   %if %upcase(&samegroup)= N %then %do;
+29884     +        %let idv=%EM_ID;
+29885     +        %let target=%EM_TARGET;
+29886     +    %end;
+29888     +    proc sql;
+29889     +          create table _node1 as
+29890     +            select distinct from as node %if %upcase(&samegroup)= N %then %do; , "&idv" as _group %end;
+29891     +            from &links;
+29892     +          create table _node2 as
+29893     +            select distinct to as node %if %upcase(&samegroup)= N %then %do; , "&target" as _group %end;
+29894     +            from &links;
+29895     +    quit;
+29897     +   %if %upcase(&samegroup)= Y %then %do;
+29898     +    proc sql;
+29899     +      create table _nodes_tmp as
+29900     +        select node
+29901     +        from _node1
+29902     +       UNION
+29903     +        select node
+29904     +        from _node2;
+29905     +    quit;
+29907     +    proc sql;
+29908     +    create table &nodes as
+29909     +     select b.*
+29910     +      from _nodes_tmp as a
+29911     +          LEFT JOIN
+29912     +           &lookupnodes as b
+29913     +        on a.node = b.node;
+29914     +    quit;
+29915     +    %end;
+29918     +   %if %upcase(&samegroup)= N %then %do;
+29919     +    data &nodes;
+29920     +          retain node _group _group_ind;
+29921     +          format _group $32.;
+29922     +          set _node1 _node2;
+29923     +          if _group="&idv" then _group_ind=1;
+29924     +          if _group="&target" then _group_ind=2;
+29925     +    run;
+29926     +    %end;
+29928     +     proc datasets lib=work nolist;
+29929     +         delete _node1 _node2 %if %upcase(&samegroup)= Y %then %do; _nodes_tmp %end;
+29930     +         ;
+29931     +    run;
+29932     +    quit;
+29934     +%mend;
+29936     +%macro  em_linkan_transpose(data=,
+29937     +                            trans=,
+29938     +                            binout=,
+29939     +                            binnum=,
+29940     +                            lookup=
+29941     +                            );
+29943     +  /*------------------------- Bin interval vars---------------------------- */
+29944     +  %if %eval(&EM_NUM_INTERVAL_INPUT+&EM_NUM_INTERVAL_REJECTED+&EM_NUM_INTERVAL_TARGET) > 0  %then %do;
+29945     +            /*   Use Binning macro      */
+29946     +             %em_getname(key=BINNINGCODE, type=file);
+29947     +             %if "&EM_PROPERTY_BINMETHOD"="BUCKET" %then %do;
+29948     +                 filename temp1 catalog 'sashelp.emapps.bucket_binning.source';
+29949     +             %end;
+29951     +             %if "&EM_PROPERTY_BINMETHOD"="QUANTILE" %then %do;
+29952     +                 filename temp1 catalog 'sashelp.emapps.quantile_binning.source';
+29953     +             %end;
+29955     +             %include temp1;
+29956     +             filename temp1;
+29957     +             filename X "&EM_USER_BINNINGCODE";
+29960     +            /* Create a temporary varset, change role to "INPUT" if (role="REJECTED" and use= Y)*/
+29961     +            data _tmp_varset;
+29962     +                set &EM_DATA_VARIABLESET;
+29963     +                if upcase(role) = "REJECTED" and upcase(use) = "Y" and upcase(level) = "INTERVAL"
+29964     +                    then role = "INPUT";
+29965     +            run;
+29968     +             %if "&EM_PROPERTY_BINMETHOD"="BUCKET" %then %do;
+29969     +                %em_apps_bucket_binning(&EM_IMPORT_DATA, _tmp_varset, &binnum, &EM_USER_BINMAPPINGS, %str(X) , dropOriginal=N, IncludeTarget=Y);
+29970     +             %end;
+29971     +             %if "&EM_PROPERTY_BINMETHOD"="QUANTILE" %then %do;
+29972     +                %em_apps_quantile_binning(&EM_IMPORT_DATA, _tmp_varset, &binnum, &EM_USER_BINMAPPINGS, %str(X) , dropOriginal=N, IncludeTarget=Y);
+29973     +             %end;
+29975     +            /*Get binned data */
+29976     +             data &binout; /*will keep all original data*/
+29977     +                  set &data(keep = %EM_BINARY_INPUT %EM_NOMINAL_INPUT %EM_ORDINAL_INPUT  %EM_INTERVAL_INPUT
+29978     +                       %EM_BINARY_REJECTED %EM_NOMINAL_REJECTED %EM_ORDINAL_REJECTED  %EM_INTERVAL_REJECTED
+29979     +                       %EM_TARGET) ;
+29980     +                  %inc X;
+29981     +              run;
+29984     +              proc print data=&binout;run;
+29985     +             filename X;
+29986     +  %end;
+29987     +  %else %do;             /*No interval vars */
+29988     +            data &binout;
+29989     +                 set &data(keep = %EM_BINARY_INPUT %EM_NOMINAL_INPUT %EM_ORDINAL_INPUT
+29990     +                       %EM_BINARY_REJECTED %EM_NOMINAL_REJECTED %EM_ORDINAL_REJECTED
+29991     +                       %EM_TARGET) ;
+29992     +           run;
+29993     +  %end;
+29995     +  proc contents data = &binout(drop=%EM_INTERVAL_INPUT   %EM_INTERVAL_REJECTED  %EM_INTERVAL_TARGET) out = varsdata(keep =  name) noprint;
+29996     +  run;
+29998     +  proc sql noprint;
+29999     +      select count(*) into :_numvars from varsdata;
+30000     +      select name into :var1-:var%left(&_numvars) from varsdata order by name;
+30001     +  quit;
+30005     +/*Create Transactional data from binout */
+30006     +  data &trans.;
+30007     +      set &binout(drop=%EM_INTERVAL_INPUT   %EM_INTERVAL_REJECTED  %EM_INTERVAL_TARGET);
+30008     +      format  tmpstr $100. item $100. level $100. _category $32.;
+30009     +      drop tmpstr;
+30010     +        %do i = 1 %to &_numvars ;
+30011     +            newid=_N_;            /*Customer Id */
+30012     +            tmpstr=cats(&&&&var&i);
+30013     +            if tmpstr eq ' '    /*If variable has a missing level*/
+30014     +            then do;
+30015     +                 item = catx('_',SYMGET('var'||LEFT(&i)),'.');
+30016     +                 level='.';
+30017     +            end;
+30018     +            else do;
+30019     +                 item = catx('_',SYMGET('var'||LEFT(&i)),&&&&var&i);
+30020     +                 level=tmpstr;
+30021     +            end;
+30022     +          _category=  "&&var&i." ;/*Original Var info*/
+30023     +         * _category_ind= &i;
+30024     +          output ;
+30025     +        %end;
+30026     +       keep newid item level _category;
+30027     +  run;
+30029     +  proc sql;
+30030     +      create table &lookup as
+30031     +      select distinct Item, level, _category, "%sysfunc(sasmsg(sashelp.dmine,lnka_level_valuelabel, noquote))" as _group
+30032     +       from &trans;
+30033     +  quit;
+30037     +  /*--- delete binout ----*/
+30038     +  proc delete data= &binout;run;
+30039     +  proc delete data= varsdata ;run;
+30041     +%mend em_linkan_transpose;
+30044     +%macro em_linkan_TransAsNodesLinks(indata = ,
+30045     +                                    idv=,
+30046     +                                    target=,
+30047     +                                    freq=,
+30048     +                                    outnodes=,
+30049     +                                    outlinks=
+30050     +                                    );             /*Explore Transactional Data: User(From)->Product(To)*/
+30052     +  /*idv: customer; target: target*/
+30053     +  data &outlinks;
+30054     +      set &indata;
+30055     +      format from $100. to $100.;
+30056     +      from = cats(&idv);
+30057     +      to  = cats(&target);
+30058     +      drop &idv &target;
+30059     +      %if &freq eq %then %do;
+30060     +      weight=1;
+30061     +      %end;
+30062     +        %if &freq ne %then %do;
+30063     +            rename &freq=weight ;
+30064     +        %end;
+30065     +      linkid=_N_;
+30066     +  run;
+30068     +   proc sql noprint;
+30069     +       select count(*) into: translinkrows
+30070     +       from &outlinks;
+30071     +   quit;
+30073     +  %if &translinkrows>10000 %then %do;/*exception handling for links data that exceeds the row download limit of 20k */
+30074     +       /*Keep only top 10k rows of links data*/
+30075     +      data &outlinks;
+30076     +         set &outlinks(obs=10000);
+30077     +      run;
+30078     +  %end;
+30080     +  %em_linkan_getnodesfromlinks(nodes=&outnodes,links=&outlinks,lookupnodes=, samegroup=N);
+30081     +/*
+30082     +  data &outlinks;
+30083     +   set &outlinks;
+30084     +   rename from=&idv to=&target;
+30085     +  run;*/
+30087     +%mend  em_linkan_TransAsNodesLinks;
+30090     +%macro em_linkan_TransToGraph_AssocSeq(indata =,
+30091     +                                       nodes=,
+30092     +                                       links=,
+30093     +                                       same=,
+30094     +                                       window=,
+30095     +                                       idv=,
+30096     +                                       target=,
+30097     +                                       seq=,
+30098     +                                       seqsuptype=,
+30099     +                                       seqsupport=,
+30100     +                                       assocsuptype=,
+30101     +                                       assocsupport=
+30102     +                                      );
+30104     +       %em_getname(key=SORTEDTRANS, type=data);
+30105     +       %em_getname(key=TRANSACTION, type=data);
+30106     +       %em_getname(key=RecdRules, type=data);
+30109     +       proc sort data=&indata out=&EM_USER_SORTEDTRANS;
+30110     +            by &idv;
+30111     +       run;
+30113     +       data &EM_USER_SORTEDTRANS;        /*need to make sure targret is char*/
+30114     +            set  &EM_USER_SORTEDTRANS;
+30115     +            chartarget=cats(&target);
+30116     +            drop &target;
+30117     +            rename chartarget=&target;
+30118     +       run;
+30120     +       proc dmdb batch data=&EM_USER_SORTEDTRANS dmdbcat=cat;
+30121     +            id &idv &seq;
+30122     +            class &target(desc);
+30123     +       run;
+30126     +       /*--- If there is no sequence var in transactional data, or raw/train data ----*/
+30128     +       %if (&seq. eq ) or ("&indata"="&EM_USER_TRANSACTION") %then %do;
+30130     +            proc assoc data=&EM_USER_SORTEDTRANS dmdbcat=cat out=aout items=2
+30131     +                        %if "&assocsuptype"="PERCENT" %then %do;
+30132     +                        pctsup=&assocsupport
+30133     +                        %end;
+30134     +                        %if "&assocsuptype"="COUNT" %then %do;
+30135     +                        support =&assocsupport
+30136     +                        %end;
+30137     +                ;
+30138     +                cust &idv ;
+30139     +                target &target;
+30140     +            run;
+30144     +             /*obs 2 to &nodeobs: one item set; &nodeobs+1 to &linkobs: two items set*/
+30145     +            proc sql noprint;
+30146     +                  select count(*) into :nodeobs from aout
+30147     +                  where item2 is missing;
+30148     +                  select count(*) into :linkobs from aout
+30149     +                 ;
+30150     +            quit;
+30152     +            %let linkfirobs=%eval(&nodeobs.+1);
+30154     +             /*------ Exception string : check if two item sets exist at current support level ----*/
+30155     +            %if &linkobs. le &linkfirobs. %then %do;
+30156     +                  %let EMEXCEPTIONSTRING = exception.server.lnka.resetsupportlevelerr;
+30157     +                  %put &em_codebar;
+30158     +                  %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.resetsupportlevel_err, noquote));
+30159     +                  %put &errormsg;
+30160     +                  %put &em_codebar;
+30161     +                  %let errorflag=&errorflag+1;
+30162     +                  %return;
+30163     +            %end;
+30165     +            proc rulegen in=aout out=_ruleout(where =(set_size=2)) minconf=&EM_PROPERTY_MINCONF;
+30166     +            run;
+30168     +            /*------ Exception string : check nobs at _ruleout , if no obs, need to reset confidence level  ----*/
+30170     +            %if %em_linkan_nobs(_ruleout) = 0 %then %do;
+30171     +                  %let EMEXCEPTIONSTRING = exception.server.lnka.resetconflevelerr;
+30172     +                  %put &em_codebar;
+30173     +                  %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.resetconflevel_err, noquote));
+30174     +                  %put &errormsg;
+30175     +                  %put &em_codebar;
+30176     +                  %let errorflag=&errorflag+1;
+30177     +                  %return;
+30178     +            %end;
+30180     +           /*Get undirected graph*/
+30181     +            data  _nodes;
+30182     +                  set aout(firstobs=2 obs=&nodeobs);
+30183     +                  rename item1= node  count=weight;
+30184     +                  keep item1 count;
+30185     +            run;
+30188     +            data &links;
+30189     +                 set _ruleout;
+30190     +                 where (_LHAND ne ' ') and (_RHAND ne ' ') and (_LHAND ne _RHAND) and (set_size=2);
+30191     +                 rename  _LHAND=from ;
+30192     +                 rename  _RHAND=to;
+30193     +                 rename  count=weight;
+30194     +                 linkid = _N_;
+30195     +                 drop item1 item2 item3;   /*need to drop them or there will be confusion when renaming "from" to "item1, "to" to "item2" in RecdRules*/
+30196     +            run;
+30198     +       %end;      /*-- end of  %if (&seq. eq ) or ("&indata"="&EM_USER_TRANSACTION") %then %do; -------*/
+30199     +       %else %do;
+30200     +            /*-- If there is sequence var, note that relatioinal data does not process seq var --*/
+30202     +            /*get directed graph*/
+30204     +            proc assoc data=&EM_USER_SORTEDTRANS dmdbcat=cat out=aout items=1
+30205     +                  %if "&assocsuptype"="PERCENT" %then %do;
+30206     +                        pctsup=&assocsupport
+30207     +                   %end;
+30208     +                   %if "&assocsuptype"="COUNT" %then %do;
+30209     +                        support =&assocsupport
+30210     +                   %end;
+30211     +                ;                                                                                                                                                               ;
+30212     +                 cust &idv ;
+30213     +                 target &target;
+30214     +            run;
+30216     +            proc sequence data=&EM_USER_SORTEDTRANS dmdbcat=cat assoc=aout out=_ruleout nitems=2
+30217     +                   %if "&seqsuptype"="PERCENT" %then %do;
+30218     +                        pctsup=&seqsupport
+30219     +                    %end;
+30220     +                    %if "&seqsuptype"="COUNT" %then %do;
+30221     +                        support =&seqsupport
+30222     +                    %end;
+30223     +                 ;
+30224     +                 cust &idv ;
+30225     +                 target &target;
+30226     +                 visit  &seq /
+30227     +                 %if &same ne . %then %do;
+30228     +                              same=&same
+30229     +                 %end;
+30230     +                 %if &window ne . %then %do;
+30231     +                              window=&window
+30232     +                 %end;
+30233     +                  ;
+30234     +            run;
+30236     +             /*------ Exception string  :  check nobs at _ruleout , if no obs, need to reset support level    ----*/
+30237     +            %if %em_linkan_nobs(_ruleout)=0 %then %do;
+30238     +                  %let EMEXCEPTIONSTRING = exception.server.lnka.resetsupportlevelerr;
+30239     +                  %put &em_codebar;
+30240     +                  %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.resetsupportlevel_err, noquote));
+30241     +                  %put &errormsg;
+30242     +                  %put &em_codebar;
+30243     +                  %let errorflag=&errorflag+1;
+30244     +                  %return;
+30245     +            %end;
+30247     +            data _nodes;
+30248     +                 set aout;
+30249     +                 if _N_ = 1 then delete;
+30250     +                 keep item1 count ;
+30251     +                 rename item1=node count=weight;
+30252     +            run;
+30254     +            data &links;
+30255     +                 set _ruleout;
+30256     +                 where (iset1 ne ' ') and (iset2 ne ' ') and (iset1 ne iset2) and (nitems=2) and (conf>=&EM_PROPERTY_MINCONF);
+30257     +                 rename iset1= from;
+30258     +                 rename iset2=to;
+30259     +                 rename  count=weight;
+30260     +                 linkid=_N_;
+30261     +            run;
+30263     +               /*------ Exception string  :  check nobs at &linkd, if no obs, need to reset confidence level    ----*/
+30264     +            %if %em_linkan_nobs(&links)=0 %then %do;
+30265     +                  %let EMEXCEPTIONSTRING = exception.server.lnka.resetconflevelerr;
+30266     +                  %put &em_codebar;
+30267     +                  %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.resetconflevel_err, noquote));
+30268     +                  %put &errormsg;
+30269     +                  %put &em_codebar;
+30270     +                  %let errorflag=&errorflag+1;
+30271     +                  %return;
+30272     +            %end;
+30274     +       %end;
+30275     +       /*Get distinct nodes from links and look up weight from _nodes*/
+30276     +       %em_linkan_getnodesfromlinks(nodes=&nodes, links=&links, lookupnodes=_nodes);
+30278     +       proc delete data =aout;run;
+30279     +       proc delete data=_ruleout;run;
+30282     +    /*-------- create Recommend Rules ---------------------*/
+30284     +    data &EM_USER_RECDRULES;
+30285     +        set &links;
+30286     +        rename from=item1;
+30287     +        rename to = item2;
+30288     +        rename conf=confidence;
+30289     +        rename weight= count;
+30290     +        rename linkid=RuleID;
+30291     +        label   to= "%sysfunc(sasmsg(sashelp.dmine, lnka_recommendeditems_vlabel , noquote))";
+30292     +    run;
+30294     +%mend em_linkan_TransToGraph_AssocSeq;
+30296     +%macro em_linkan_recommend(intrans=, ar=, outtrans=);
+30297     +/*intrans: transaction data;
+30298     +  ar=association rule, i.e.,&EM_USER_RECDRULES;
+30299     +  outtrans=output recommendation table;*/
+30301     +  *get the recommended items;
+30302     +  *assuming the length of inferences is limit to one association rule;
+30303     +  %let id=%EM_ID;
+30304     +  %let target=%EM_TARGET;
+30305     +  proc sql;
+30306     +      create table tmp1 as
+30307     +      select a.&id, b.item2 as &target, sum(b.count*b.confidence)/sum(b.count) as confidence
+30308     +      from &intrans a, &ar b
+30309     +      where a.&target = b.item1
+30310     +      group by a.&id, b.item2
+30311     +      order by a.&id, confidence desc
+30312     +      ;
+30313     +  quit;
+30315     +  proc sql noprint;
+30316     +      create table tmp2 as
+30317     +      select tmp1.&id, tmp1.&target
+30318     +      from tmp1
+30319     +      except
+30320     +      select c.&id, c.&target
+30321     +      from &intrans c
+30322     +      ;
+30323     +      create table _outtrans as
+30324     +      select a.*, b.confidence
+30325     +      from tmp2 a, tmp1 b
+30326     +      where a.&id=b.&id and a.&target=b.&target
+30327     +      order by a.&id, confidence desc
+30328     +      ;
+30329     +  quit;
+30331     +  data &outtrans;
+30332     +      set _outtrans;
+30333     +      by &id; retain rank 0;
+30334     +      if first.&id then rank=1;
+30335     +      else rank+1;
+30336     +      label   confidence= "%sysfunc(sasmsg(sashelp.dmine, lnka_confidence_vlabel , noquote))";
+30337     +      label   rank= "%sysfunc(sasmsg(sashelp.dmine, lnka_rank_vlabel , noquote))";
+30338     +      label   &id="%sysfunc(sasmsg(sashelp.dmine, lnka_idv_vlabel , noquote))";
+30339     +  run;
+30341     +  proc datasets lib=work nolist;
+30342     +     delete tmp1 tmp2 _outtrans;
+30343     +  run;
+30344     +%mend em_linkan_recommend;
+30347     +%macro em_linkan_getoverlap2_rela(trans=,overlap=,overlap2=);    /*for relational data*/
+30349     +%let tarname=%EM_TARGET;
+30351     +proc sql;
+30352     +  create table trans2 as
+30353     +  select  distinct item, level, _category as varname
+30354     +  from &trans;
+30355     +quit;
+30357     +/*remove target's contribution for scoring:strip(trans2.varname) ne "&tarname"*/
+30358     +proc sql;
+30359     +  create table _overlap2 as
+30360     +  select b.node, trans2.varname, trans2.level,b.ItemCluster as ItemCluster, b.intensity
+30361     +  from trans2,&overlap as b
+30362     +  where trans2.item=b.node and strip(trans2.varname) ne "&tarname";
+30364     +  create table &overlap2 as
+30365     +  select d.*, c.FORMAT, c.TYPE,c.LENGTH
+30366     +   from
+30367     +     _overlap2 as d
+30368     +  left join
+30369     +     &EM_IMPORT_DATA_CMETA as c
+30370     +  on d.varname=c.NAME
+30371     +  order by d.node, d.ItemCluster;
+30372     +quit;
+30374     +data &overlap2;
+30375     +    set &overlap2;
+30376     +    if strip(format) eq '$' then format = ' ';
+30377     +    if missing(format) then do;
+30378     +       if type eq '' then format='best32.';
+30379     +        else if type eq 'N'
+30380     +            then format=cats('best',length,'.');
+30381     +            else format=cats('$',length,'.');
+30382     +    end;
+30383     +    else do;
+30384     +    if index(format,'.') le 0
+30385     +           then format=cats(format,'.');
+30386     +    end;
+30387     +    if upcase(format) eq  'BEST.'
+30388     +           then format='best32.';
+30389     +    drop length type;
+30390     +run;
+30392     +proc datasets lib=work nolist;
+30393     +  delete trans2 _overlap2;
+30394     +run;
+30396     +%mend em_linkan_getoverlap2_rela;
+30398     +%macro em_linkan_getoverlap2_trans(overlap=,overlap2=,target=);    /*for transactional data*/
+30401     +proc sql;
+30402     +  create table &overlap2(drop=_tmpnode_) as
+30403     +  select tranwrd( _tmpnode_,"'","''") as node, *, "&target" as varname
+30404     +  from &overlap(rename=(node=_tmpnode_));
+30405     +quit;
+30407     +%mend em_linkan_getoverlap2_trans;
+30411     +/*-----------------------------------------------------------------------------------
+30413     +     Call proc optgraph to get Centrality Measure and Community Info(Undirected Graph Only)
+30415     +------------------------------------------------------------------------------------*/
+30418     +%macro em_linkan_AnalyzeGraph(outnodes =,
+30419     +                              clustering_coef =,
+30420     +                              influence = ,
+30421     +                              close =,
+30422     +                              between =  ,
+30423     +                              eigen = ,
+30424     +                              eigen_algorithm = ,
+30425     +                              eigen_maxiter = ,
+30426     +                              hub = ,
+30427     +                              auth = ,
+30428     +                              seq=,
+30429     +                              max_comm_size=,
+30430     +                              max_diameter=,
+30431     +                              relation= ,
+30432     +                              commalgorithm = ,
+30433     +                              link_removal_ratio = ,
+30434     +                              max_iterations = ,
+30435     +                              modularity = ,
+30436     +                              resolution_list =
+30437     +                              );
+30439     +   %if &seq. eq %then %do;
+30440     +       %EM_GETNAME(KEY=COMMNODE, TYPE=DATA);
+30441     +       %EM_GETNAME(KEY=COMMLINK, TYPE=DATA);
+30442     +       %EM_GETNAME(KEY=COMMOVERLAP, TYPE=DATA);
+30443     +       %EM_GETNAME(KEY=COMMLEVEL, TYPE=DATA);
+30444     +   %end;
+30445     +   %EM_GETNAME(KEY=NODES, TYPE=DATA);
+30446     +   %EM_GETNAME(KEY=LINKS, TYPE=DATA);
+30448     +   data &EM_USER_LINKS;
+30449     +       set &EM_USER_LINKS;
+30450     +       weightInv=1.0/weight;
+30451     +   run;
+30453     +   proc optgraph
+30454     +       data_nodes = &EM_USER_NODES
+30455     +       data_links = &EM_USER_LINKS
+30456     +    %if &seq. eq %then %do;
+30457     +       graph_direction =undirected
+30458     +    %end;
+30459     +    %else %do;
+30460     +       graph_direction =directed
+30461     +    %end;
+30463     +    %if &transaction_data_indicator=0 %then %do;  /*relational data*/
+30464     +       out_nodes = _outnodes;
+30465     +    %end;
+30466     +    %else %do;
+30467     +       out_nodes =&outnodes ;
+30468     +    %end;
+30470     +       centrality
+30471     +       %if &seq. eq %then %do;
+30472     +                 degree = out
+30473     +               %if "&eigen"="Y" %then %do;
+30474     +                 eigen = both
+30475     +               eigen_algorithm =&eigen_algorithm
+30476     +               eigen_maxiter = &eigen_maxiter
+30477     +               %end;
+30478     +       %end;
+30479     +       %else %do;
+30480     +                 degree = both
+30481     +                %if "&hub"="Y" %then %do;
+30482     +                 hub=both
+30483     +                %end;
+30484     +                %if "&auth"="Y" %then %do;
+30485     +                 auth=both
+30486     +                %end;
+30487     +                %if "&hub"="Y" or "&auth"="Y" %then %do;
+30488     +                 eigen_algorithm =&eigen_algorithm
+30489     +                 eigen_maxiter = &eigen_maxiter
+30490     +                %end;
+30491     +       %end;
+30492     +        %if "&clustering_coef"="Y" %then %do;
+30493     +                 clustering_coef
+30494     +        %end;
+30495     +        %if "&influence"="Y" %then %do;
+30496     +               influence = both
+30497     +        %end;
+30498     +        %if "&close"="Y" %then %do;
+30499     +                close =   both
+30500     +        %end;
+30501     +        %if "&between"="Y" %then %do;
+30502     +                between = both
+30503     +        %end;
+30504     +        %if "&close"="Y" or "&between"="Y"  %then %do;
+30505     +               weight2=weightInv
+30506     +        %end;
+30507     +      ;
+30509     +       %if &seq. eq %then %do;  /*relational or transactional with no seq*/
+30510     +       community
+30511     +                algorithm =  &commalgorithm
+30512     +                link_removal_ratio =&link_removal_ratio
+30513     +                maxiter =  &max_iterations
+30514     +                modularity = &modularity
+30515     +                resolution_list =  &resolution_list
+30516     +              /*  recursive (max_comm_size=&max_comm_size. max_diameter=&max_diameter. relation=&relation.)    */
+30517     +                out_comm_links=&EM_USER_COMMLINK
+30518     +                out_community=&EM_USER_COMMNODE
+30519     +                out_level=&EM_USER_COMMLEVEL
+30520     +                out_overlap=&EM_USER_COMMOVERLAP
+30521     +       ;
+30522     +       %end;
+30523     +   run;
+30525     +   proc delete data=&EM_USER_NODES;run;
+30527     +   /*Change Community Data, map community 0-N to 1-N+1*/
+30528     +   %if &seq. eq %then %do;
+30530     +       data &EM_USER_COMMLINK;
+30531     +             format from_community_id $100. to_community_id $100.;
+30532     +             label  from_community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_from_community_id_vlabel, noquote))" ;
+30533     +             label  to_community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_to_community_id_vlabel, noquote))" ;
+30534     +             label link_weight ="%sysfunc(sasmsg(sashelp.dmine, lnka_weight_vlabel, noquote))" ;
+30535     +             label linkid ="%sysfunc(sasmsg(sashelp.dmine, lnka_linkid_vlabel, noquote))" ;
+30536     +             set &EM_USER_COMMLINK;
+30537     +             from_community = from_community+1;
+30538     +             to_community   = to_community+1;
+30539     +             from_community_id = cats(from_community);
+30540     +             to_community_id   = cats(to_community);
+30541     +             linkid=_N_;
+30542     +             rename from_community_id =from_ItemClusterID to_community_id =to_ItemClusterID;
+30543     +             drop level resolution from_community to_community;
+30544     +       run;
+30546     +       data &EM_USER_COMMNODE;
+30547     +             format community_id $100.;
+30548     +             label  community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_community_id_vlabel, noquote))" ;
+30549     +             label  community="%sysfunc(sasmsg(sashelp.dmine,lnka_community_1_vlabel, noquote))" ;
+30550     +             label  nodes="%sysfunc(sasmsg(sashelp.dmine,lnka_nodes_vlabel, noquote))" ;
+30551     +             set &EM_USER_COMMNODE;
+30552     +             community = community+1;
+30553     +             community_id   = cats(community);
+30554     +             rename community=ItemCluster community_id=ItemClusterID;
+30555     +             drop level resolution;
+30556     +       run;
+30558     +       data &EM_USER_COMMOVERLAP;
+30559     +             format community_id $100.;
+30560     +             label  community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_community_id_vlabel, noquote))" ;
+30561     +             label  community="%sysfunc(sasmsg(sashelp.dmine,lnka_community_1_vlabel, noquote))" ;
+30562     +             label node ="%sysfunc(sasmsg(sashelp.dmine, lnka_node_vlabel, noquote))" ;
+30563     +             label intensity ="%sysfunc(sasmsg(sashelp.dmine, lnka_intensity_vlabel, noquote))" ;
+30564     +             label community ="%sysfunc(sasmsg(sashelp.dmine, lnka_community_1_vlabel, noquote))" ;
+30565     +             label linkid ="%sysfunc(sasmsg(sashelp.dmine, lnka_linkid_vlabel, noquote))" ;
+30566     +             set &EM_USER_COMMOVERLAP;
+30567     +             community = community+1;
+30568     +             community_id   = cats(community);
+30569     +             linkid=_N_;
+30570     +             rename community_id=ItemClusterID community=ItemCluster;
+30571     +       run;
+30574     +   %end;
+30576     +   /*---- add group info: which var item is from, Only relational data has LOOKUP table**/
+30578     +   %if &transaction_data_indicator=0 %then %do;
+30579     +      proc sql;
+30580     +           create table  &OUTNODES as
+30581     +                  select  *
+30582     +                  from _outnodes as A, &EM_USER_LOOKUP as B
+30583     +                  where  A.node=B.Item;
+30584     +           alter table  &OUTNODES  drop item;
+30585     +      quit;
+30586     +      proc delete data=_outnodes;run;
+30587     +      proc delete data=&EM_USER_LOOKUP;
+30589     +   %end;
+30590     +   %else %do;/*For transactional data, add group info*/
+30591     +       %let target=%EM_TARGET;
+30592     +        data &EM_USER_OUTNODES;
+30593     +        format _group $32.;
+30594     +             set &EM_USER_OUTNODES;
+30595     +        _group="&target";
+30596     +        *_group_ind=1;/*don't need it for color*/
+30597     +        run;
+30599     +   %end;
+30601     +   %if &seq. eq %then %do;
+30602     +      data &OUTNODES;
+30603     +           format community_id $100.;
+30604     +           label  community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_community_id_vlabel, noquote))" ;
+30605     +           set &OUTNODES;
+30606     +           community_1=community_1+1;
+30607     +           community_id=cats(community_1);
+30608     +           rename community_id=ItemClusterID;
+30609     +    run;
+30610     +   %end;
+30611     +   data &OUTNODES;;
+30612     +     set &OUTNODES;
+30613     +     %if &transaction_data_indicator=0 %then %do;
+30614     +     drop level;
+30615     +     %end;
+30616     +           label  node="%sysfunc(sasmsg(sashelp.dmine, lnka_node_vlabel, noquote))" ;
+30617     +           label  weight="%sysfunc(sasmsg(sashelp.dmine, lnka_weight_vlabel, noquote))";
+30618     +           label  _group= "%sysfunc(sasmsg(sashelp.dmine, lnka_group_vlabel, noquote))";
+30619     +           label  _category= "%sysfunc(sasmsg(sashelp.dmine, lnka_category_vlabel, noquote))";
+30620     +           label  community_1= "%sysfunc(sasmsg(sashelp.dmine, lnka_community_1_vlabel, noquote))";
+30621     +           label  centr_degree_in= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_degree_in_vlabel, noquote))";
+30622     +           label  centr_degree_out= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_degree_out_vlabel, noquote))";
+30623     +           label  centr_degree = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_degree_vlabel, noquote))";
+30624     +           label  centr_close_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_wt_vlabel, noquote))";
+30625     +           label  centr_close_in_wt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_in_wt_vlabel, noquote))";
+30626     +           label  centr_close_out_wt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_out_wt_vlabel, noquote))";
+30627     +           label  centr_close_unwt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_unwt_vlabel, noquote))";
+30628     +           label  centr_close_in_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_in_unwt_vlabel, noquote))";
+30629     +           label  centr_close_out_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_out_unwt_vlabel, noquote))";
+30630     +           label  centr_between_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_between_wt_vlabel, noquote))";
+30631     +           label  centr_between_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_between_unwt_vlabel, noquote))";
+30632     +           label  centr_influence1_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_influence1_wt_vlabel, noquote))";
+30633     +           label  centr_influence1_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_influence1_unwt_vlabel, noquote))";
+30634     +           label  centr_influence2_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_influence2_wt_vlabel, noquote))";
+30635     +           label  centr_influence2_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_influence2_unwt_vlabel, noquote))";
+30636     +           label  centr_cluster= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_cluster_vlabel, noquote))";
+30637     +           label  centr_eigen_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_eigen_wt_vlabel, noquote))";
+30638     +           label  centr_eigen_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_eigen_unwt_vlabel, noquote))";
+30639     +           label  centr_auth_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_auth_wt_vlabel, noquote))";
+30640     +           label  centr_auth_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_auth_unwt_vlabel, noquote))";
+30641     +           label  centr_hub_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_hub_wt_vlabel, noquote))";
+30642     +           label  centr_hub_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_hub_unwt_vlabel, noquote))";
+30643     +           rename community_1=ItemCluster;
+30644     +  run;
+30646     +   %em_getname(key=CENTMEASURE, type=data);
+30647     +   %em_getname(key=WTDCENTMEASURE, type=data);
+30648     +   /*Seperate &outnodes to two tables: Unweighted Centrality Measure Table and Weighted Centrality Measure Table for bar chart output*/
+30649     +   proc sql;
+30650     +      create table &EM_USER_CENTMEASURE as
+30651     +            select node, centr_degree_out
+30652     +            %if &seq. ne  %then %do;
+30653     +                , centr_degree_in ,  centr_degree
+30654     +                %if "&hub"="Y" %then %do;
+30655     +                  , centr_hub_unwt
+30656     +                %end;
+30657     +                %if "&auth"="Y" %then %do;
+30658     +                  , centr_auth_unwt
+30659     +                %end;
+30660     +            %end;
+30661     +            %else %do;
+30662     +                %if "&eigen"="Y" %then %do;
+30663     +                , centr_eigen_unwt
+30664     +               %end;
+30665     +            %end;
+30666     +            %if "&clustering_coef"="Y" %then %do;
+30667     +                 , centr_cluster
+30668     +             %end;
+30669     +             %if "&close"="Y" %then %do;
+30670     +                   , centr_close_unwt
+30671     +             %end;
+30672     +             %if "&between"="Y" %then %do;
+30673     +                   , centr_between_unwt
+30674     +             %end;
+30675     +             %if "&influence"="Y" %then %do;
+30676     +                  , centr_influence1_unwt
+30677     +                  , centr_influence2_unwt
+30678     +             %end;
+30679     +            from &outnodes;
+30681     +      create table &EM_USER_WTDCENTMEASURE as
+30682     +            select node, centr_degree_out
+30683     +            %if &seq. ne  %then %do;
+30684     +                , centr_degree_in ,  centr_degree
+30685     +                %if "&hub"="Y" %then %do;
+30686     +                 , centr_hub_wt
+30687     +                %end;
+30688     +                %if "&auth"="Y" %then %do;
+30689     +                  , centr_auth_wt
+30690     +                %end;
+30691     +            %end;
+30692     +            %else %do;
+30693     +                %if "&eigen"="Y" %then %do;
+30694     +                , centr_eigen_wt
+30695     +               %end;
+30696     +            %end;
+30697     +            %if "&clustering_coef"="Y" %then %do;
+30698     +                 , centr_cluster
+30699     +             %end;
+30700     +             %if "&close"="Y" %then %do;
+30701     +                  , centr_close_wt
+30702     +             %end;
+30703     +             %if "&between"="Y" %then %do;
+30704     +                  , centr_between_wt
+30705     +             %end;
+30706     +             %if "&influence"="Y" %then %do;
+30707     +                  , centr_influence1_wt
+30708     +                  , centr_influence2_wt
+30709     +             %end;
+30710     +            from &outnodes;
+30711     +   quit;
+30714     +data &EM_USER_LINKS;
+30715     +set &EM_USER_LINKS;
+30716     +drop weightInv;
+30717     +run;
+30719     +%mend em_linkan_AnalyzeGraph;
+NOTE: %INCLUDE (level 1) ending.
+MPRINT(EM_LINKANALYSIS_MAIN):   filename temp;
+NOTE: Fileref TEMP has been deassigned.
+MPRINT(EM_LINKANALYSIS_MAIN):   filename temp catalog 'sashelp.emexpl.link_score.source';
+NOTE: %INCLUDE (level 1) file TEMP is file SASHELP.EMEXPL.LINK_SCORE.SOURCE.
+30722     +%MACRO EM_LINKANALYSIS_SCORE;
+30723     + %let em_lnka_transdata_indicator=0;
+30724     + %if "&EM_IMPORT_TRANSACTION" ne "" and (%sysfunc(exist(&EM_IMPORT_TRANSACTION)) or %sysfunc(exist(&EM_IMPORT_TRANSACTION, view))) %then %do;
+30725     +      %let  em_lnka_transdata_indicator=1;
+30726     + %end;
+30729     + /*----------------------------Transactional Data, Recommendation=Y-------------------------------------------------*/
+30730     + /*Generate Recommendation Table and RecdRules only for transactional data*/
+30732     + %if (&em_lnka_transdata_indicator=1) and (&EM_PROPERTY_RecommendInd=Y) %then %do;
+30733     +    %em_getname(key=Recommend, type=data);
+30734     +    %em_getname(key=RecdRules, type=data);
+30735     +    %em_getname(key=SortedTrans, type=data);
+30736     +    %em_getname(key=RECOMMENDFIltered, type=data);
+30738     +    /*Get full recommendation table:&EM_USER_Recommend*/
+30739     +    %em_linkan_recommend(intrans=&EM_USER_SortedTrans, ar=&EM_USER_RecdRules, outtrans=&EM_USER_Recommend);
+30742     +     /*-----------  Filtered Recommendation Table: autodisplay=Y, criteria: Top N or Minimum Confidence -----------*/
+30744     +     data &EM_user_RECOMMENDFILTERED;
+30745     +              set &EM_user_RECOMMEND;
+30746     +              where (rank le &EM_PROPERTY_TOPN)       /* write only top N for each customer to output data set */
+30747     +              %if "&EM_PROPERTY_CRITOPERATOR" eq "OR" %then %do;
+30748     +                  or
+30749     +              %end;
+30750     +              %else %do;
+30751     +                  and
+30752     +              %end;
+30753     +              %if &EM_PROPERTY_CONFFILTER ne . %then %do;
+30754     +                 (confidence>=&EM_PROPERTY_CONFFILTER)
+30755     +              %end;
+30756     +              %else %do;
+30757     +                 (confidence>=&EM_PROPERTY_MINCONF)
+30758     +              %end;
+30759     +              ;
+30760     +     run;
+30762     +     /*------------  Generate Publish Score Code ------------------*/
+30764     +     %let indata = %str(&)%str(EM_SCORE_OUTPUT);
+30765     +     %let emid=%EM_ID;
+30766     +     %let target=%EM_TARGET;
+30767     +     %let outdata=_tmpout ;
+30768     +     %let ruledata = ruledata;
+30770     +     filename _F1 catalog 'sashelp.emutil.em_data2code.source';
+30771     +        %inc _F1;
+30772     +     filename _F1;
+30774     +     filename _F1 "&EM_FILE_EMPUBLISHSCORECODE";
+30775     +     %if %sysfunc(fexist(_F1)) eq 1 %then %do;
+30776     +      %let rc = %sysfunc(fdelete(_F1));
+30777     +     %end;
+30778     +     data _null_;
+30779     +        file _F1 mod;
+30780     +        put "&em_codebar;";
+30781     +        put "* LA: Score Code for Transactional Data, Rec=Y;";
+30782     +        put "* To run this score code as stand alone uncomment the code below and set the LADATA and EM_SCORE_OUTPUT macro variables;";
+30783     +        put '* %let EM_SCORE_OUTPUT=;';
+30784     +        put '* %let LADATA =;';
+30785     +        put '* data &EM_SCORE_OUTPUT;';
+30786     +        put '*   set &LADATA;';
+30787     +        put "* run;";
+30788     +        put "&em_codebar;";
+30789     +     run;
+30790     +     %em_data2code(data=&EM_USER_RECDRULES, outdata=&ruledata, outfile=&EM_FILE_EMPUBLISHSCORECODE, APPEND=Y);
+30792     +     data _null_;
+30793     +       file _F1 mod;
+30794     +       put "Proc sql noprint;";
+30795     +       put "create table tmp1 as ";
+30796     +       put "select a.&emid , b.item2 as &target, sum(b.count*b.confidence)/sum(b.count) as confidence ";
+30797     +       put "from &indata a, &ruledata b ";
+30798     +       put "where cats(a.&target) = b.item1 ";
+30799     +       put "group by a.&emid, b.item2 ";
+30800     +       put "order by a.&emid, confidence desc; ";
+30801     +       put "create table tmp2 as select &emid, &target ";
+30802     +       put "from tmp1 ";
+30803     +       put "except ";
+30804     +       put "      select &emid, cats(&target) as &target";
+30805     +       put "      from &indata ";
+30806     +       put " ; ";
+30807     +       put "create table &outdata as   ";
+30808     +       put "      select b.&emid,b.&target,b.confidence  ";
+30809     +       put "      from tmp2 a, tmp1 b    ";
+30810     +       put "      where a.&emid=b.&emid and a.&target=b.&target  ";
+30811     +       put " ;  ";
+30812     +       put "quit; ";
+30814     +       put " data &outdata;";
+30815     +       put "     set &outdata;";
+30816     +       put "     by &emid; retain rank 0;";
+30817     +       put "     if first.&emid then rank=1;";
+30818     +       put "     else rank+1;";
+30819     +       put " run;";
+30821     +       %if  "&em_property_RECOMMENDEXPORT"="FILTEREDRECTABLE" %then %do;
+30823     +       put "data &indata;";
+30824     +       put "      set &outdata;";
+30825     +       put " where (rank le &EM_PROPERTY_TOPN) ";
+30826     +              %if "&EM_PROPERTY_CRITOPERATOR" eq "OR" %then %do;
+30827     +       put "      or ";
+30828     +              %end;
+30829     +              %else %do;
+30830     +       put "     and ";
+30831     +              %end;
+30832     +              %if &EM_PROPERTY_CONFFILTER ne . %then %do;
+30833     +       put "     (confidence>=&EM_PROPERTY_CONFFILTER) ";
+30834     +              %end;
+30835     +              %else %do;
+30836     +       put "     (confidence>=&EM_PROPERTY_MINCONF) ";
+30837     +              %end;
+30838     +       put ";";
+30839     +       %end;
+30840     +       %else %do;
+30841     +       put " data &indata;";
+30842     +       put "     set &outdata;";
+30843     +       %end;
+30844     +       put "run;";
+30846     +       put "proc datasets lib=work nolist;";
+30847     +       put "   delete tmp1 tmp2 &outdata &ruledata;";
+30848     +       put "run;";
+30849     +    run;
+30851     +    filename _F1;
+30853     +    data &em_export_transaction / view= &em_export_transaction;
+30854     +        set &EM_USER_SORTEDTRANS;
+30855     +    run;
+30856     +    data &em_export_train / view= &em_export_train;
+30857     +        %if  "&em_property_RECOMMENDEXPORT"="FULLRECTABLE" %then %do;
+30858     +              set &em_user_recommend;
+30859     +        %end;
+30860     +        %if  "&em_property_RECOMMENDEXPORT"="FILTEREDRECTABLE" %then %do;
+30861     +              set &em_user_recommendfiltered;
+30862     +        %end;
+30863     +    run;
+30866     + %end;
+30869     + /*----------------------------Transactional Data, Recommendation=N-------------------------------------------------------*/
+30870     + /*If transactional data with Recommendation=N: export import data(sorted by id) plus segmentation info if no sequence var;
+30871     +   else export import transaction data srted by ID;*/
+30873     + %if &em_lnka_transdata_indicator=1  and (&EM_PROPERTY_RecommendInd=N)  %then %do;
+30874     + %EM_GETNAME(KEY=SORTEDTRANS, TYPE=DATA);*Ye;
+30876     +    /*------------No Sequence variable------------*/
+30877     +    %if %EM_SEQUENCE eq %then %do;
+30878     +      %em_getname(key=COMMOVERLAP, type=data);
+30879     +      %em_getname(key=COMMOVERLAP2, type=data);
+30880     +      %let target_vars=%EM_TARGET;
+30881     +      %em_linkan_getoverlap2_trans(overlap=&EM_USER_COMMOVERLAP,overlap2=&EM_USER_COMMOVERLAP2,target=&target_vars);
+30883     +      %let indata = %str(&)%str(EM_SCORE_OUTPUT);
+30884     +      %let id=%EM_ID;
+30887     +      filename flowcode "&EM_FILE_EMFLOWSCORECODE";
+30888     +      filename pubcode "&EM_FILE_EMPUBLISHSCORECODE";
+30890     +      %let dsid = %sysfunc(open(&EM_USER_COMMOVERLAP2));
+30891     +      %let vn_node = %sysfunc(varnum(&dsid, node));
+30892     +      %let vn_varname = %sysfunc(varnum(&dsid, varname));
+30893     +      %let vn_community = %sysfunc(varnum(&dsid, ItemCluster));
+30894     +      %let vn_cummuintensity = %sysfunc(varnum(&dsid, intensity));
+30896     +      /*get max community number: community has been remaped to 1-max_comm*/
+30898     +      proc sql noprint;
+30899     +        select max(ItemCluster) into:_num_arr
+30900     +        from &EM_USER_COMMOVERLAP2;
+30901     +      quit;
+30902     +      %let _num_arr = &_num_arr;
+30904     +      %if %sysfunc(fexist(pubcode)) eq 1 %then %do;
+30905     +      %let rc = %sysfunc(fdelete(pubcode));
+30906     +      %end;
+30908     +      data _null_;
+30909     +        file pubcode mod ;
+30910     +        put "&em_codebar;";
+30911     +        put "* LA: Score Code for Transactional Data with No Seq Var, Rec=N;";
+30912     +        put "* To run this score code as stand alone uncomment the code below and set the LADATA and EM_SCORE_OUTPUT macro variables;";
+30913     +        put '* %let EM_SCORE_OUTPUT=;';
+30914     +        put '* %let LADATA =;';
+30915     +        put '* data &EM_SCORE_OUTPUT;';
+30916     +        put '*   set &LADATA;';
+30917     +        put "* run;";
+30918     +        put "&em_codebar;";
+30919     +        put "proc sort data=&indata;by &id;run;";
+30920     +        put "data &indata;";
+30921     +        put "set &indata;";
+30922     +      run;
+30924     +      %if %sysfunc(fexist(flowcode)) eq 1 %then %do;
+30925     +      %let rc = %sysfunc(fdelete(flowcode));
+30926     +      %end;
+30928     +      data _null_;
+30929     +        file flowcode mod ;
+30930     +        put "array _cummuintens{&_num_arr};";
+30931     +        put "by &id ;";
+30932     +        put "if first.&id then do;";
+30933     +        put "do i=1 to &_num_arr ; ";
+30934     +        put "_cummuintens[i] = 0 ;";
+30935     +        put "end ;";
+30936     +        put "end ;";
+30937     +        %do %while(^ %sysfunc(fetch(&dsid)));
+30938     +         %let varname =   %sysfunc(getvarc(&dsid, &vn_varname));
+30939     +         %let node=  %sysfunc(getvarc(&dsid, &vn_node));
+30940     +         %let ItemCluster = %sysfunc(getvarn(&dsid, &vn_community));
+30941     +         %let intensity = %sysfunc(getvarn(&dsid, &vn_cummuintensity));
+30942     +         put "if cats(&varname) eq '&node' then _cummuintens{&ItemCluster} + &intensity;";
+30943     +        %end;
+30944     +        put "if last.&id then do;";
+30945     +        put "_max= _cummuintens{1} ; ";
+30946     +        put "_SEGMENT_= 1; ";
+30947     +        put "do i=1 to &_num_arr ; ";
+30948     +        put "if _cummuintens[i]>_max then do ;";
+30949     +        put "_max=_cummuintens[i];";
+30950     +        put "_SEGMENT_= i;";
+30951     +        put "end ;";
+30952     +        put "if _max=0 then _SEGMENT_=0;";
+30953     +        put "end ;";
+30954     +        put "end ;";
+30955     +        put "drop i ;";
+30956     +        put "drop _cummuintens1-_cummuintens&_num_arr. _max;";/*should not add run;*/
+30957     +        %let dsid = %sysfunc(close(&dsid));
+30958     +      run;
+30960     +      %em_copyfile(infref=flowcode, outfref=pubcode, append=Y);/*Append flowcode to pubcode;*/
+30962     +      /*Manually score on sorted transactional data(sort by id var): generate segmentation column;*/
+30963     +      data &em_export_transaction / view= &em_export_transaction;
+30964     +        set &EM_USER_SORTEDTRANS;
+30965     +        %inc flowcode;
+30966     +         label _segment_="%sysfunc(sasmsg(sashelp.dmine, lnka_segmtid_vlabel, noquote))";
+30967     +      run;
+30968     +      /*----Defect S0974157:_Segment_ variable is not generated for Validation and Test input--1--*/
+30969     +      %if "&EM_IMPORT_VALIDATE" ne "" and (%sysfunc(exist(&EM_IMPORT_VALIDATE)) or %sysfunc(exist(&EM_IMPORT_VALIDATE, view))) %then %do;
+30970     +        proc sort data=&em_import_validate out=&em_export_validate;by %EM_ID;run;
+30972     +        data &em_export_validate;
+30973     +          set &em_export_validate;
+30974     +          %inc flowcode;
+30975     +          label _segment_="%sysfunc(sasmsg(sashelp.dmine, lnka_segmtid_vlabel, noquote))";
+30976     +        run;
+30977     +      %end;
+30979     +      %if "&EM_IMPORT_TEST" ne "" and (%sysfunc(exist(&EM_IMPORT_TEST)) or %sysfunc(exist(&EM_IMPORT_TEST, view))) %then %do;
+30980     +        proc sort data=&em_import_test out=&em_export_test;by %EM_ID;run;
+30982     +        data &em_export_test;
+30983     +          set  &em_export_test;
+30984     +          %inc flowcode;
+30985     +          label _segment_="%sysfunc(sasmsg(sashelp.dmine, lnka_segmtid_vlabel, noquote))";
+30986     +        run;
+30987     +      %end;
+30988     +      /*----END--Defect S0974157:_Segment_ variable is not generated for Validation and Test input--1--*/
+30990     +      %if %sysfunc(fexist(flowcode)) eq 1 %then %do;
+30991     +      %let rc = %sysfunc(fdelete(flowcode));
+30992     +      %end;
+30994     +      filename flowcode;
+30995     +      filename pubcode;
+30998     +      data &em_export_train / view= &em_export_train;
+30999     +         set  &em_export_transaction(keep=&id _SEGMENT_);
+31000     +         by &id;
+31001     +         if last.&id then output;
+31002     +      run;
+31004     +      filename _F "&EM_FILE_CDELTA_TRAIN";
+31005     +        data _null_;
+31006     +                length string $400;
+31007     +                file _F;
+31008     +                        string = 'if upcase(NAME)="_SEGMENT_" then do;';               put string;
+31009     +                        string = '      ROLE="SEGMENT";';                              put string;
+31010     +                        string = '      LABEL="%sysfunc(sasmsg(sashelp.dmine, lnka_segmtvar_vlabel, noquote))";';  put string;
+31011     +                        string = 'end;';                                               put string;
+31012     +        run;
+31014     +      filename _F;
+31016     +      filename _FTRANS "&EM_FILE_CDELTA_TRANSACTION";
+31017     +        data _null_;
+31018     +                length string $400;
+31019     +                file _FTRANS;
+31020     +                        string = 'if upcase(NAME)="_SEGMENT_" then do;';               put string;
+31021     +                        string = '      ROLE="SEGMENT";';                              put string;
+31022     +                        string = '      LABEL="%sysfunc(sasmsg(sashelp.dmine, lnka_segmtvar_vlabel, noquote))";';  put string;
+31023     +                        string = 'end;';                                               put string;
+31024     +        run;
+31026     +      filename _FTRANS;
+31028     +      *%EM_METACHANGE(name=_segment_, role=SEGMENT);
+31030     +      proc delete data=&EM_USER_COMMOVERLAP2;run;
+31031     +     /* proc delete data=&EM_USER_SORTEDTRANS;run;*/
+31032     +    %end;
+31034     +    /*-----------With Sequence variable------------*/
+31035     +    /*Transactional Data with Sequence Var: No community info*/
+31036     +    %else %do;
+31037     +        data &em_export_transaction / view= &em_export_transaction;
+31038     +        set &EM_USER_SORTEDTRANS;
+31039     +        run;
+31040     +    %end;
+31042     + %end;
+31044     + /*----------------------------Relational Data: segmentation info added----------------------------------*/
+31045     + /*relational data scoring*/
+31046     + %if &em_lnka_transdata_indicator=0 %then %do;
+31048     +  /*-------------Append varname and level to commoverlap data for scoring relational data---------------*/
+31049     +      %em_getname(key=TRANS, type=data);
+31050     +      %em_getname(key=COMMOVERLAP, type=data);
+31051     +      %em_getname(key=COMMOVERLAP2, type=data);
+31052     +      %em_getname(key=BINMAPPINGS, type=data);
+31053     +      %em_linkan_getoverlap2_rela(trans=&EM_USER_TRANS,overlap=&EM_USER_COMMOVERLAP,overlap2=&EM_USER_COMMOVERLAP2);
+31056     +     filename flowcode "&EM_FILE_EMFLOWSCORECODE";
+31057     +     filename pubcode "&EM_FILE_EMPUBLISHSCORECODE";
+31060     +     /*get max community number: community has been remaped to 1-max_comm*/
+31061     +     proc sql noprint;
+31062     +          select max(ItemCluster) into:_num_arr from &EM_USER_COMMOVERLAP2;
+31063     +     quit;
+31064     +     %let _num_arr = &_num_arr;  /*%let removes leading and trailing blanks*/
+31066     +     %let binmappings_exist=0;
+31067     +     %if "&EM_USER_BINMAPPINGS" ne "" and %sysfunc(exist(&EM_USER_BINMAPPINGS)) %then %do;
+31068     +     proc sql noprint;
+31069     +          create table bin_vars as
+31070     +          select distinct bin_name
+31071     +          from &EM_USER_BINMAPPINGS;
+31072     +     quit;
+31073     +     %let binmappings_exist=1;
+31074     +     %end;
+31077     +      filename X "&EM_USER_BINNINGCODE";
+31079     +     %if %sysfunc(fexist(flowcode)) eq 1 %then %do;
+31080     +      %let rc = %sysfunc(fdelete(flowcode));
+31081     +     %end;
+31082     +     data _null_;
+31083     +        file flowcode mod;
+31084     +        put "&em_codebar;";
+31085     +        put "* LA: Score Code for Train/Raw Data;";
+31086     +        put "* To run this score code as stand alone uncomment the code below and set the LADATA and EM_SCORE_OUTPUT macro variables;";
+31087     +        put '* %let EM_SCORE_OUTPUT=;';
+31088     +        put '* %let LADATA =;';
+31089     +        put '* data &EM_SCORE_OUTPUT;';
+31090     +        put '*   set &LADATA;';
+31091     +        put "* run;";
+31092     +        put "&em_codebar;";
+31093     +      run;
+31095     +    %em_linkan_appendfiles(flowcode, X);/*append binningcode to flowcode;*/
+31096     +     filename X;
+31098     +     %let label_segment_=%sysfunc(sasmsg(sashelp.dmine, lnka_segmtid_vlabel, noquote));
+31099     +     data _null_;
+31100     +          file flowcode mod;
+31101     +             length string $200 deqlevel $200;
+31102     +             set &EM_USER_COMMOVERLAP2 end=eof;
+31104     +             if _N_ =1 then do;
+31105     +                put "array _intens{&_num_arr};";
+31106     +                put "do i=1 to &_num_arr ; ";
+31107     +                put "drop i ;";
+31108     +                put "_intens[i] = 0 ;";
+31109     +                put "end ;";
+31110     +                put "length _UFormat $200;";
+31111     +                put "drop _UFormat;";
+31112     +                put "_UFormat = '';";
+31113     +             end;
+31115     +             deqlevel  =  upcase(tranwrd(level, "'","''"));
+31117     +             string = "_UFormat = put("!!strip(varname)!!","!!strip(format)!!");";
+31118     +             put string;
+31119     +             string = '%dmnormip(_UFormat);';
+31120     +             put string;
+31121     +             /*S097627*/
+31122     +             if deqlevel ne '.' then do;
+31123     +               string =  "if _UFormat eq '"!!strip(deqlevel)!!"' then _intens{"!!strip(ItemCluster)!!"} + "!!strip(intensity)!!";";
+31124     +               put string;
+31125     +             end;
+31126     +             else do;
+31127     +               string =  "if _UFormat eq ' ' or  _UFormat eq '.' then _intens{"!!strip(ItemCluster)!!"} + "!!strip(intensity)!!";";
+31128     +               put string;
+31129     +             end;
+31131     +             if eof then do;
+31132     +             put "_max = _intens{1} ; ";
+31133     +             put "_segment_ = 1; ";
+31134     +             put "do i=1 to &_num_arr ; ";
+31135     +             put "if _intens[i]>_max then do ;";
+31136     +             put "_max = _intens[i];";
+31137     +             put "_segment_ = i;";
+31138     +             put "end ;";
+31139     +             put "end ;";
+31140     +             put "drop _intens1-_intens&_num_arr. _max;";
+31141     +             put "label _segment_ = &label_segment_;";
+31142     +          end;
+31143     +    run;
+31146     +    %if &binmappings_exist eq 1 %then %do;
+31147     +           data _null_;
+31148     +              file flowcode mod;
+31149     +               /*--- drop binned variable ----------------*/
+31150     +               Set work.bin_vars;
+31151     +                      put "drop " bin_name ";";
+31152     +            run;
+31153     +    %end;
+31155     +    %em_copyfile(infref=flowcode, outfref=pubcode, append=N);
+31157     +     filename _F "&EM_FILE_CDELTA_TRAIN";
+31158     +        data _null_;
+31159     +                length string $400;
+31160     +                file _F;
+31161     +                        string = 'if upcase(NAME)="_SEGMENT_" then do;';               put string;
+31162     +                        string = '      ROLE="SEGMENT";';                              put string;
+31163     +                        string = '      LABEL="%sysfunc(sasmsg(sashelp.dmine, lnka_segmtvar_vlabel, noquote))";';                              put string;
+31164     +                        string = 'end;';                                               put string;
+31165     +        run;
+31167     +      filename _F;
+31169     +    filename flowcode;
+31170     +    filename pubcode;
+31171     +    *%EM_METACHANGE(name=_segment_, role=SEGMENT);
+31173     +    proc delete data=&EM_USER_COMMOVERLAP2;run;
+31176     + %end;
+31178     +%MEND EM_LINKANALYSIS_SCORE;
+NOTE: %INCLUDE (level 1) ending.
+MPRINT(EM_LINKANALYSIS_MAIN):   filename temp;
+NOTE: Fileref TEMP has been deassigned.
+MPRINT(EM_LINKANALYSIS_SCORE):  ;
+MPRINT(EM_LINKANALYSIS_SCORE):  ;
+MPRINT(EM_LINKANALYSIS_SCORE):  ;
+MPRINT(EM_LINKANALYSIS_SCORE):  ;
+MPRINT(EM_LINKAN_RECOMMEND):   *get the recommended items;
+MPRINT(EM_LINKAN_RECOMMEND):   *assuming the length of inferences is limit to one association rule;
+MPRINT(EM_LINKAN_RECOMMEND):   proc sql;
+MPRINT(EM_LINKAN_RECOMMEND):   create table tmp1 as select a.session_id, b.item2 as requested_file, sum(b.count*b.confidence)/sum(b.count) as confidence from EMWS3.Link_SortedTrans a, EMWS3.Link_RecdRules b where a.requested_file = b.item1 group by 
+a.session_id, b.item2 order by a.session_id, confidence desc ;
+NOTE: Table WORK.TMP1 created, with 1625 rows and 3 columns.
+
+MPRINT(EM_LINKAN_RECOMMEND):   quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.11 seconds
+      cpu time            0.06 seconds
+      
+
+MPRINT(EM_LINKAN_RECOMMEND):   proc sql noprint;
+MPRINT(EM_LINKAN_RECOMMEND):   create table tmp2 as select tmp1.session_id, tmp1.requested_file from tmp1 except select c.session_id, c.requested_file from EMWS3.Link_SortedTrans c ;
+NOTE: Table WORK.TMP2 created, with 607 rows and 2 columns.
+
+MPRINT(EM_LINKAN_RECOMMEND):   create table _outtrans as select a.*, b.confidence from tmp2 a, tmp1 b where a.session_id=b.session_id and a.requested_file=b.requested_file order by a.session_id, confidence desc ;
+NOTE: Table WORK._OUTTRANS created, with 607 rows and 3 columns.
+
+MPRINT(EM_LINKAN_RECOMMEND):   quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.09 seconds
+      cpu time            0.06 seconds
+      
+
+MPRINT(EM_LINKAN_RECOMMEND):   data EMWS3.Link_Recommend;
+MPRINT(EM_LINKAN_RECOMMEND):   set _outtrans;
+MPRINT(EM_LINKAN_RECOMMEND):   by session_id;
+MPRINT(EM_LINKAN_RECOMMEND):   retain rank 0;
+MPRINT(EM_LINKAN_RECOMMEND):   if first.session_id then rank=1;
+MPRINT(EM_LINKAN_RECOMMEND):   else rank+1;
+MPRINT(EM_LINKAN_RECOMMEND):   label confidence= "Confidence";
+MPRINT(EM_LINKAN_RECOMMEND):   label rank= "Rank";
+MPRINT(EM_LINKAN_RECOMMEND):   label session_id= "ID Variable";
+MPRINT(EM_LINKAN_RECOMMEND):   run;
+
+NOTE: There were 607 observations read from the data set WORK._OUTTRANS.
+NOTE: The data set EMWS3.LINK_RECOMMEND has 607 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.12 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKAN_RECOMMEND):   proc datasets lib=work nolist;
+MPRINT(EM_LINKAN_RECOMMEND):   delete tmp1 tmp2 _outtrans;
+MPRINT(EM_LINKAN_RECOMMEND):   run;
+
+NOTE: Deleting WORK.TMP1 (memtype=DATA).
+NOTE: Deleting WORK.TMP2 (memtype=DATA).
+NOTE: Deleting WORK._OUTTRANS (memtype=DATA).
+MPRINT(EM_LINKANALYSIS_SCORE):  ;
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_SCORE):   data EMWS3.Link_RECOMMENDFIltered;
+MPRINT(EM_LINKANALYSIS_SCORE):   set EMWS3.Link_Recommend;
+MPRINT(EM_LINKANALYSIS_SCORE):   where (rank le 1) and (confidence>=50) ;
+MPRINT(EM_LINKANALYSIS_SCORE):   run;
+
+NOTE: There were 224 observations read from the data set EMWS3.LINK_RECOMMEND.
+      WHERE (rank<=1) and (confidence>=50);
+NOTE: The data set EMWS3.LINK_RECOMMENDFILTERED has 224 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.10 seconds
+      cpu time            0.04 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_SCORE):   filename _F1 catalog 'sashelp.emutil.em_data2code.source';
+NOTE: %INCLUDE (level 1) file _F1 is file SASHELP.EMUTIL.EM_DATA2CODE.SOURCE.
+31182     +/*
+31183     +       MACRO: EM_DATA2CODE
+31184     +
+31185     +       PURPOSE: Convert Data Set to Data Step Code
+31186     +
+31187     +       PARAMETERS:
+31188     +
+31189     +            DATA        = data set
+31190     +            OUTDATA     = out data set
+31191     +            OUTFILE     = file where to saved the code
+31192     +            APPEND      = append (Y/N)
+31193     +
+31194     +       USAGE:
+31195     +
+31196     +            %em_data2code(data=, outdata=WORK.DATA);
+31197     +
+31198     +       AUTHOR:   Dominique Latour
+31199     +
+31200     +       AMENDMENTS: Initial Version 17Jan03 SASDZL
+31201     +
+31202     +*/
+31203     +
+31204     +%macro em_data2code(data=, outdata=WORK.DATA, outfile=, append=N);
+31205     +   %if &data eq %then %do;
+31206     +       %put ERROR: Data set not defined;
+31207     +   %end;
+31208     +   %else %do;
+31209     +       %if %sysfunc(exist(&data)) eq 0 and %sysfunc(exist(&data, VIEW)) eq 0 %then %do;
+31210     +           %put ERROR: Data set does not exist;
+31211     +       %end;
+31212     +       %else %do;
+31213     +           %global em_data em_outdata em_codefile em_append;
+31214     +           %let em_data=&data;
+31215     +           %let em_outdata=&outdata;
+31216     +           %let em_codefile=&outfile;
+31217     +           %let em_append=&append;
+31218     +           proc display c=sashelp.emutil.data2code.scl;
+31219     +           run;
+31220     +      %end;
+31221     +   %end;
+31222     +%mend;
+31223     +
+NOTE: %INCLUDE (level 1) ending.
+MPRINT(EM_LINKANALYSIS_SCORE):   filename _F1;
+NOTE: Fileref _F1 has been deassigned.
+MPRINT(EM_LINKANALYSIS_SCORE):   filename _F1 "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMPUBLISHSCORE.sas";
+MPRINT(EM_LINKANALYSIS_SCORE):   data _null_;
+MPRINT(EM_LINKANALYSIS_SCORE):   file _F1 mod;
+MPRINT(EM_LINKANALYSIS_SCORE):   put "*------------------------------------------------------------*;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "* LA: Score Code for Transactional Data, Rec=Y;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "* To run this score code as stand alone uncomment the code below and set the LADATA and EM_SCORE_OUTPUT macro variables;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put '* %let EM_SCORE_OUTPUT=;';
+MPRINT(EM_LINKANALYSIS_SCORE):   put '* %let LADATA =;';
+MPRINT(EM_LINKANALYSIS_SCORE):   put '* data &EM_SCORE_OUTPUT;';
+MPRINT(EM_LINKANALYSIS_SCORE):   put '*   set &LADATA;';
+MPRINT(EM_LINKANALYSIS_SCORE):   put "* run;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "*------------------------------------------------------------*;";
+MPRINT(EM_LINKANALYSIS_SCORE):   run;
+
+NOTE: The file _F1 is:
+      Filename=J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMPUBLISHSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=0,
+      Last Modified=13Nov2018:10:31:33,
+      Create Time=13Nov2018:10:30:32
+
+NOTE: 9 records were written to the file _F1.
+      The minimum record length was 6.
+      The maximum record length was 120.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_DATA2CODE):   proc display c=sashelp.emutil.data2code.scl;
+MPRINT(EM_DATA2CODE):   run;
+
+NOTE: There were 111 observations read from the data set EMWS3.LINK_RECDRULES.
+NOTE: The data set WORK.RULEDATA has 111 observations and 9 variables.
+31224      %em_copyfile(infref=#LN00348, outfref=#LN00347, append=Y);
+MPRINT(EM_COPYFILE):   data _null_;
+MPRINT(EM_COPYFILE):   length line $20000;
+MPRINT(EM_COPYFILE):   file #LN00347 MOD lrecl=20000;
+MPRINT(EM_COPYFILE):   fid=fopen("#LN00348",'i',20000,'v');
+MPRINT(EM_COPYFILE):   if fid > 0 then do;
+MPRINT(EM_COPYFILE):   do while(^fread(fid));
+MPRINT(EM_COPYFILE):   rlen = frlen(fid);
+MPRINT(EM_COPYFILE):   rc= fget(fid,line,20000);
+MPRINT(EM_COPYFILE):   start = length(line)-length(left(line))+1;
+MPRINT(EM_COPYFILE):   line=strip(line);
+MPRINT(EM_COPYFILE):   put @start line;
+MPRINT(EM_COPYFILE):   end;
+MPRINT(EM_COPYFILE):   if fid > 0 then rc=fclose(fid);
+MPRINT(EM_COPYFILE):   end;
+MPRINT(EM_COPYFILE):   run;
+
+NOTE: The file #LN00347 is:
+      Filename=J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMPUBLISHSCORE.sas,
+      RECFM=V,LRECL=20000,File Size (bytes)=397,
+      Last Modified=13Nov2018:10:31:33,
+      Create Time=13Nov2018:10:30:32
+
+NOTE: 251 records were written to the file #LN00347.
+      The minimum record length was 1.
+      The maximum record length was 240.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_DATA2CODE):  ;
+
+NOTE: PROCEDURE DISPLAY used (Total process time):
+      real time           0.09 seconds
+      cpu time            0.03 seconds
+      
+
+MPRINT(EM_DATA2CODE):   
+MPRINT(EM_LINKANALYSIS_SCORE):  ;
+MPRINT(EM_LINKANALYSIS_SCORE):   data _null_;
+MPRINT(EM_LINKANALYSIS_SCORE):   file _F1 mod;
+MPRINT(EM_LINKANALYSIS_SCORE):   put "Proc sql noprint;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "create table tmp1 as ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "select a.session_id , b.item2 as requested_file, sum(b.count*b.confidence)/sum(b.count) as confidence ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "from &EM_SCORE_OUTPUT a, ruledata b ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "where cats(a.requested_file) = b.item1 ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "group by a.session_id, b.item2 ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "order by a.session_id, confidence desc; ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "create table tmp2 as select session_id, requested_file ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "from tmp1 ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "except ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "      select session_id, cats(requested_file) as requested_file";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "      from &EM_SCORE_OUTPUT ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put " ; ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "create table _tmpout as   ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "      select b.session_id,b.requested_file,b.confidence  ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "      from tmp2 a, tmp1 b    ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "      where a.session_id=b.session_id and a.requested_file=b.requested_file  ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put " ;  ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "quit; ";
+MPRINT(EM_LINKANALYSIS_SCORE):   put " data _tmpout;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "     set _tmpout;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "     by session_id; retain rank 0;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "     if first.session_id then rank=1;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "     else rank+1;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put " run;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put " data &EM_SCORE_OUTPUT;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "     set _tmpout;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "run;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "proc datasets lib=work nolist;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "   delete tmp1 tmp2 _tmpout ruledata;";
+MPRINT(EM_LINKANALYSIS_SCORE):   put "run;";
+MPRINT(EM_LINKANALYSIS_SCORE):   run;
+
+NOTE: The file _F1 is:
+      Filename=J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMPUBLISHSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=24541,
+      Last Modified=13Nov2018:10:31:33,
+      Create Time=13Nov2018:10:30:32
+
+NOTE: 31 records were written to the file _F1.
+      The minimum record length was 3.
+      The maximum record length was 102.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_SCORE):   filename _F1;
+NOTE: Fileref _F1 has been deassigned.
+MPRINT(EM_LINKANALYSIS_SCORE):   data EMWS3.Link_TRANSACTION / view= EMWS3.Link_TRANSACTION;
+MPRINT(EM_LINKANALYSIS_SCORE):   set EMWS3.Link_SortedTrans;
+MPRINT(EM_LINKANALYSIS_SCORE):   run;
+
+NOTE: DATA STEP view saved on file EMWS3.LINK_TRANSACTION.
+NOTE: A stored DATA STEP view cannot run under a different operating system.
+NOTE: DATA statement used (Total process time):
+      real time           0.06 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_SCORE):   data EMWS3.Link_TRAIN / view= EMWS3.Link_TRAIN;
+MPRINT(EM_LINKANALYSIS_SCORE):   set EMWS3.Link_Recommend;
+MPRINT(EM_LINKANALYSIS_SCORE):   run;
+
+NOTE: DATA STEP view saved on file EMWS3.LINK_TRAIN.
+NOTE: A stored DATA STEP view cannot run under a different operating system.
+NOTE: DATA statement used (Total process time):
+      real time           0.08 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_MAIN):  ;
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * End SCORE: Link;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+31225      *------------------------------------------------------------*;
+31226      * End SCORE: Link;
+31227      *------------------------------------------------------------*;
+
+31229      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):     *------------------------------------------------------------*;
+31230      * Link: Computing metadata for TRAIN data;
+MPRINT(EM_DIAGRAM):   * Link: Computing metadata for TRAIN data;
+31231      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+
+NOTE: View EMWS3.LINK_TRAIN.VIEW used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+MPRINT(EM_DIAGRAM):    *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * &nodeid: Computing Metadata for TRAIN data;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   filename _delta "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\CDELTA_TRAIN.sas";
+MPRINT(EMADVISECOLUMNS):   proc display c=sashelp.emmeta.advisecolumns.scl;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    options validvarname=any;
+MPRINT(EMADVISECOLUMNS):   proc contents data=EMWS3.Link_TRAIN out=_tempAdvisor noprint;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):   options validvarname=V7;
+MPRINT(EMADVISECOLUMNS):    data _null_;
+MPRINT(EMADVISECOLUMNS):   dsid = open('EMWS3.Link_TRAIN');
+MPRINT(EMADVISECOLUMNS):   call symput('_dsidTable', strip(put(dsid, best.)));
+MPRINT(EMADVISECOLUMNS):   if dsid then do;
+MPRINT(EMADVISECOLUMNS):   call symput('_engineTable', attrc(dsid, 'ENGINE'));
+MPRINT(EMADVISECOLUMNS):   dsid = close(dsid);
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    proc contents data=EMWS3.Link_TRAIN out=WORK.M2E_8TR3 noprint;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M2E_8TR3;
+MPRINT(EMADVISECOLUMNS):   length NAME $ 64 TYPE $ 1 LABEL $ 200 FORMAT $ 36 INFORMAT $36 INDEX $ 1 INDEXTYPE $ 9;
+MPRINT(EMADVISECOLUMNS):   label NAME =;
+MPRINT(EMADVISECOLUMNS):   set WORK.M2E_8TR3(keep=name type length label format formatl formatd informat informl informd idxusage rename=(type=itype));
+MPRINT(EMADVISECOLUMNS):   if itype = 1 then type = 'N';
+MPRINT(EMADVISECOLUMNS):   else type = 'C';
+MPRINT(EMADVISECOLUMNS):   if formatl > 0 then do;
+MPRINT(EMADVISECOLUMNS):   if format ne '' then do;
+MPRINT(EMADVISECOLUMNS):   if type='N' then format = strip(format)!!strip(put(formatl, best12.))!!'.'!!strip(put(formatd, best12.));
+MPRINT(EMADVISECOLUMNS):   else format = strip(format)!!strip(put(formatl, best12.))!!'.';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else format = strip(put(formatl, best12.))!!'.'!!strip(put(formatd, best12.));
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if format ne '' then format = strip(format)!!'.';
+MPRINT(EMADVISECOLUMNS):   if informl > 0 then do;
+MPRINT(EMADVISECOLUMNS):   if informat ne ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if type='N' then informat = strip(informat)!!strip(put(informl, best12.))!!'.'!!strip(put(informd, best12.));
+MPRINT(EMADVISECOLUMNS):   else informat = strip(informat)!!strip(put(informl, best12.))!!'.';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else informat = strip(put(informl, best12.))!!'.'!!strip(put(informd, best12.));
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if informat ne '' then informat = strip(informat)!!'.';
+MPRINT(EMADVISECOLUMNS):   if idxusage = 'NONE' then index ="N";
+MPRINT(EMADVISECOLUMNS):   else index = "Y";
+MPRINT(EMADVISECOLUMNS):   indextype = idxusage;
+MPRINT(EMADVISECOLUMNS):   drop idxusage itype formatl formatd informl informd;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M2E_8TR3;
+MPRINT(EMADVISECOLUMNS):   length UNAME $64;
+MPRINT(EMADVISECOLUMNS):   set WORK.M2E_8TR3;
+MPRINT(EMADVISECOLUMNS):   UNAME = upcase(NAME);
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    proc sort data=WORK.M39P3T__ NOTHREADS;
+MPRINT(EMADVISECOLUMNS):   by UNAME;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M39P3T__;
+MPRINT(EMADVISECOLUMNS):   drop UNAME;
+MPRINT(EMADVISECOLUMNS):   set WORK.M39P3T__;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M0O6MBEQ(keep=NAME ATTR);
+MPRINT(EMADVISECOLUMNS):   length ATTR $ 20;
+MPRINT(EMADVISECOLUMNS):   set WORK.M39P3T__;
+MPRINT(EMADVISECOLUMNS):   if level ne "INTERVAL" then do;
+MPRINT(EMADVISECOLUMNS):   if order = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'ORDER';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if format ne ' ' and formattype = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'FORMATTYPE';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if role = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'ROLE';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if level = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'LEVEL';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if type = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'TYPE';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if index = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'INDEX';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if report = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'REPORT';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):   proc sort NOTHREADS;
+MPRINT(EMADVISECOLUMNS):   by attr;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M39P3T__;
+MPRINT(EMADVISECOLUMNS):   length NAME $64 ROLE $ 32 LEVEL $ 10 ORDER $ 8 CREATOR $32 FORMATTYPE $ 10 FAMILY $ 10 LOWERLIMIT 8 UPPERLIMIT 8 REPORT $1 DISTRIBUTION $ 20 COMMENT $64;
+MPRINT(EMADVISECOLUMNS):   length levelAssigned 8 roleAssigned 8 PRICE 8;
+MPRINT(EMADVISECOLUMNS):   set WORK.M39P3T__;
+MPRINT(EMADVISECOLUMNS):   if formattype = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if format ne ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if type = 'N' then do;
+MPRINT(EMADVISECOLUMNS):   pos = indexc(format,'.1234567890');
+MPRINT(EMADVISECOLUMNS):   if pos > 1 then tempfmt = substr(format,1, pos-1);
+MPRINT(EMADVISECOLUMNS):   else tempfmt = ' ';
+MPRINT(EMADVISECOLUMNS):   flen = length(tempfmt);
+MPRINT(EMADVISECOLUMNS):   select;
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("DATE" "DAY" "DDMMYY" "DOWNAME" "JULDAY" "JULIAN" "MMDDYY" "MMDDYYD" "MMDDYYC" "MMDDYYN" "MMDDYYP" "MMDDYYS" "MONNAME" "MONTH" "MONYY" "NENGO" "QTR" "QTRR" "WEEKDATE" "WEEKDATX" "WEEKDAY" "WORDDATE" "WORDDATX" 
+"YEAR" "YYMMDD" "YYMON" "YYMMDDC" "YYMMDDD" "YYMMDDN" "YYMMDDP" "YYMMDDS" "EURDFDE" "NJDATE" "NLDATE" "EURDFDD" "EURDFDWN" "EURDFMN" "EURDFMY" "EURDFWK" "EURDFWKX" "EURDFWDX" "EURDFDN" "EURDFDE" )) formattype = 'DATE';
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("DATETIME" "EURDFDT" "TOD" )) formattype = "DATETIME";
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("HHMM" "HOUR" "MMSS" "TIME" "TIMEAMPM" )) formattype = "TIME";
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("COMMA" "COMMAX" "DOLLAR" "DOLLARX" "E" "FRACT" "NEGPAREN" "PERCENT")) formattype="QUANTITY";
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("BINARY" "HEX" "IB" "OCTAL" "PD" "PIB" "PK" "RB" "SSN" "Z" "ZD")) formattype = "CODING";
+MPRINT(EMADVISECOLUMNS):   otherwise do;
+MPRINT(EMADVISECOLUMNS):   formattype = "USER";
+MPRINT(EMADVISECOLUMNS):   if compress(tempfmt, '0123456789.', '') = '' then formattype='NUM';
+MPRINT(EMADVISECOLUMNS):   else if substr(tempfmt, 1, 6)='NLDATE' then formattype = "DATE";
+MPRINT(EMADVISECOLUMNS):   else if substr(tempfmt, 1, 6)='NLDATM' then formattype = "DATETIME";
+MPRINT(EMADVISECOLUMNS):   else if substr(tempfmt, 1, 4)='NLTIM' then formattype = "TIME";
+MPRINT(EMADVISECOLUMNS):   else if flen >= 4 then do;
+MPRINT(EMADVISECOLUMNS):   str = substr(tempfmt,1,4);
+MPRINT(EMADVISECOLUMNS):   if str in ("MMYY" "YYMM" "YYQR") then formattype ="DATE";
+MPRINT(EMADVISECOLUMNS):   else if str = "S370" then formattype = "CODING";
+MPRINT(EMADVISECOLUMNS):   else if str = "BEST" then formattype = "NUM";
+MPRINT(EMADVISECOLUMNS):   drop str;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if flen >=3 and substr(tempfmt,1,3) = "YYQ" then formatType = "DATE";
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   drop flen tempfmt pos;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else do;
+MPRINT(EMADVISECOLUMNS):   formatType = "CATEGORY";
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if formatType = "NUM" then do;
+MPRINT(EMADVISECOLUMNS):   if index = "Y" then formatType = "DISCRETE";
+MPRINT(EMADVISECOLUMNS):   else formatType = "QUANTITY";
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if level = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if formatType in ("CATEGORY", "CODING", "ID") or type = "C" then level = "NOMINAL";
+MPRINT(EMADVISECOLUMNS):   else level = "INTERVAL";
+MPRINT(EMADVISECOLUMNS):   levelAssigned = 1;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else level = upcase(level);
+MPRINT(EMADVISECOLUMNS):   if role = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   length name_prefix $8 _uname $64;
+MPRINT(EMADVISECOLUMNS):   drop name_prefix _uname _freqflag;
+MPRINT(EMADVISECOLUMNS):   retain _freqflag;
+MPRINT(EMADVISECOLUMNS):   if LENGTH> 80 then ROLE = 'TEXT';
+MPRINT(EMADVISECOLUMNS):   _uname = upcase(NAME);
+MPRINT(EMADVISECOLUMNS):   select(_uname);
+MPRINT(EMADVISECOLUMNS):   when('_PARTIND_') do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'ID';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   when('_WARN_') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_SEGMENT') do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'SEGMENT';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   when('_NODE_') do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'SEGMENT';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   when('EM_CLASSTARGET') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_VALUETARGET') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_PREDICTION') ROLE = 'PREDICT';
+MPRINT(EMADVISECOLUMNS):   when('EM_PROBABILITY') ROLE = 'PREDICT';
+MPRINT(EMADVISECOLUMNS):   when('EM_EVENTPROBABILITY') ROLE = 'PREDICT';
+MPRINT(EMADVISECOLUMNS):   when('EM_CLASSIFICATION') ROLE = 'CLASSIFICATION';
+MPRINT(EMADVISECOLUMNS):   when('EM_DECISION') ROLE = 'DECISION';
+MPRINT(EMADVISECOLUMNS):   when('EM_PROFIT') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_LOSS') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_ROI') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('URI') ROLE = 'URL';
+MPRINT(EMADVISECOLUMNS):   when('FILTERED') ROLE = 'TEXTLOC';
+MPRINT(EMADVISECOLUMNS):   otherwise do;
+MPRINT(EMADVISECOLUMNS):   if upcase(NAME) =: 'ZIP' then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'REJECTED';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   COMMENT = 'Rejected by: Exceed the maximum class level of %s';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if upcase(NAME) in('FREQ', 'FREQUENCY') then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'FREQ';
+MPRINT(EMADVISECOLUMNS):   if TYPE = 'C' then ROLE = 'INPUT';
+MPRINT(EMADVISECOLUMNS):   else if _freqflag =1 then ROLE='REJECTED';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else do;
+MPRINT(EMADVISECOLUMNS):   name_prefix = scan(_uname, 1, '_');
+MPRINT(EMADVISECOLUMNS):   if scan(_uname, 2, '_') = '' then name_prefix='';
+MPRINT(EMADVISECOLUMNS):   if name_prefix in('F', 'I', 'U') then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'CLASSIFICATION';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if name_prefix in('Q') then ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   else if name_prefix in('P', 'V') then ROLE = 'PREDICT';
+MPRINT(EMADVISECOLUMNS):   else if name_prefix in('R', 'RS', 'RT', 'RD', 'RDS', 'RDT', 'RA', 'RAS', 'RAT') then ROLE = 'RESIDUAL';
+MPRINT(EMADVISECOLUMNS):   else if name_prefix ='D' then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'DECISION';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if name_prefix ='B' then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'SEGMENT';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if name_prefix in('EP', 'BP', 'CP', 'EL', 'CL', 'BL', 'W', 'ROI', 'IC') then ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   else do;
+MPRINT(EMADVISECOLUMNS):   array _ROLE_ (19) $32 _TEMPORARY_ ('ASSESS','CLASSIFICATION','CENSOR', 'COST', 'CROSSID', 'DECISION', 'ID','INPUT', 'LABEL', 'MISSING','PREDICT','REFERRER','REJECTED', 'RESIDUAL','SEGMENT', 'SEQUENCE','TARGET', 'TEXT', 'TIMEID');
+MPRINT(EMADVISECOLUMNS):   drop _found_ i;
+MPRINT(EMADVISECOLUMNS):   _found_=0;
+MPRINT(EMADVISECOLUMNS):   do i=1 to 19 until(_found_=1);
+MPRINT(EMADVISECOLUMNS):   if index(_uname, trim(_ROLE_{i}))=1 then do;
+MPRINT(EMADVISECOLUMNS):   ROLE=_ROLE_{i};
+MPRINT(EMADVISECOLUMNS):   if ROLE = 'ID' then LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   else if ROLE = 'SEGMENT' then LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   else if ROLE = 'TIMEID' and TYPE='N' then LEVEL = 'INTERVAL';
+MPRINT(EMADVISECOLUMNS):   _found_=1;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if length(_uname)>2 then do;
+MPRINT(EMADVISECOLUMNS):   if substr(reverse(trim(_uname)), 1, 3) = 'DI_' then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'ID';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if ROLE='FREQ' then _freqflag=1;
+MPRINT(EMADVISECOLUMNS):   else if ROLE = 'CLASSIFICATION' then LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   if symexist('RATEMKG_ROLE') then do;
+MPRINT(EMADVISECOLUMNS):   if upcase(symget('RATEMKG_ROLE')) in('Y', 'YES') then do;
+MPRINT(EMADVISECOLUMNS):   if _uname =: 'POLICY' then ROLE = 'POLICYID';
+MPRINT(EMADVISECOLUMNS):   else if _uname in ('PARTITION', '_PARTIND_') then ROLE = 'PARTITION';
+MPRINT(EMADVISECOLUMNS):   else if type = 'N' then do;
+MPRINT(EMADVISECOLUMNS):   if _uname = 'EXPOSURE' then ROLE = 'EXPOSURE';
+MPRINT(EMADVISECOLUMNS):   else if _uname = 'YEAR' then ROLE = 'YEAR';
+MPRINT(EMADVISECOLUMNS):   else if _uname = 'WEIGHT' then ROLE = 'WEIGHT';
+MPRINT(EMADVISECOLUMNS):   else if _uname = 'OFFSET' then ROLE = 'OFFSET';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if role = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if formattype in('DATE', 'DATETIME', 'TIME') then role = 'TIMEID';
+MPRINT(EMADVISECOLUMNS):   else role = 'INPUT';
+MPRINT(EMADVISECOLUMNS):   roleAssigned = 1;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else role = upcase(role);
+MPRINT(EMADVISECOLUMNS):   if REPORT = '' then REPORT = 'N';
+MPRINT(EMADVISECOLUMNS):   if symexist('dmwb_product') then do;
+MPRINT(EMADVISECOLUMNS):   if upcase(symget('dmwb_product')) = 'FACTORYMINER_DATASOURCE' then do;
+MPRINT(EMADVISECOLUMNS):   if ROLE ^in('INPUT', 'TARGET', 'REJECTED', 'SEGMENT', 'FREQ', 'ID', 'KEY') then ROLE='REJECTED';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M39P3T__;
+MPRINT(EMADVISECOLUMNS):   set WORK.M39P3T__;
+MPRINT(EMADVISECOLUMNS):   label NAME = "Variable Name" TYPE = "Type" ROLE = "Role" LEVEL= "Measurement Level" ORDER= "Order" CREATOR= "Creator" FORMATTYPE= "Format Type" FAMILY= "Family" DISTRIBUTION= "Distribution" PRICE= "Price" LOWERLIMIT= "Lower 
+limit" UPPERLIMIT= "Upper Limit" REPORT= "Report" COMMENT= "Comment" INDEX= "Index" INDEXTYPE= "IndexType" LABEL= "Label" LENGTH= "Length";
+MPRINT(EMADVISECOLUMNS):   drop levelAssigned roleAssigned;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):   
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   data EMWS3.Link_CMeta_TRAIN;
+MPRINT(EM_DIAGRAM):   set WORK.COLUMNMETA;
+MPRINT(EM_DIAGRAM):   length creator $32;
+MPRINT(EM_DIAGRAM):   CREATOR = "Link";
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Link: Apply Delta Code;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   filename _delta;
+NOTE: View EMWS3.LINK_TRAIN.VIEW used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+31554      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):    *------------------------------------------------------------*;
+31555      * Link: Computing metadata for TRANSACTION data;
+MPRINT(EM_DIAGRAM):   * Link: Computing metadata for TRANSACTION data;
+31556      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+
+NOTE: View EMWS3.LINK_TRANSACTION.VIEW used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+MPRINT(EM_DIAGRAM):    *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * &nodeid: Computing Metadata for TRANSACTION data;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EMADVISECOLUMNS):   proc display c=sashelp.emmeta.advisecolumns.scl;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    options validvarname=any;
+MPRINT(EMADVISECOLUMNS):   proc contents data=EMWS3.Link_TRANSACTION out=_tempAdvisor noprint;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):   options validvarname=V7;
+MPRINT(EMADVISECOLUMNS):    data _null_;
+MPRINT(EMADVISECOLUMNS):   dsid = open('EMWS3.Link_TRANSACTION');
+MPRINT(EMADVISECOLUMNS):   call symput('_dsidTable', strip(put(dsid, best.)));
+MPRINT(EMADVISECOLUMNS):   if dsid then do;
+MPRINT(EMADVISECOLUMNS):   call symput('_engineTable', attrc(dsid, 'ENGINE'));
+MPRINT(EMADVISECOLUMNS):   dsid = close(dsid);
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    proc contents data=EMWS3.Link_TRANSACTION out=WORK.M08AFWET noprint;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M08AFWET;
+MPRINT(EMADVISECOLUMNS):   length NAME $ 64 TYPE $ 1 LABEL $ 200 FORMAT $ 36 INFORMAT $36 INDEX $ 1 INDEXTYPE $ 9;
+MPRINT(EMADVISECOLUMNS):   label NAME =;
+MPRINT(EMADVISECOLUMNS):   set WORK.M08AFWET(keep=name type length label format formatl formatd informat informl informd idxusage rename=(type=itype));
+MPRINT(EMADVISECOLUMNS):   if itype = 1 then type = 'N';
+MPRINT(EMADVISECOLUMNS):   else type = 'C';
+MPRINT(EMADVISECOLUMNS):   if formatl > 0 then do;
+MPRINT(EMADVISECOLUMNS):   if format ne '' then do;
+MPRINT(EMADVISECOLUMNS):   if type='N' then format = strip(format)!!strip(put(formatl, best12.))!!'.'!!strip(put(formatd, best12.));
+MPRINT(EMADVISECOLUMNS):   else format = strip(format)!!strip(put(formatl, best12.))!!'.';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else format = strip(put(formatl, best12.))!!'.'!!strip(put(formatd, best12.));
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if format ne '' then format = strip(format)!!'.';
+MPRINT(EMADVISECOLUMNS):   if informl > 0 then do;
+MPRINT(EMADVISECOLUMNS):   if informat ne ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if type='N' then informat = strip(informat)!!strip(put(informl, best12.))!!'.'!!strip(put(informd, best12.));
+MPRINT(EMADVISECOLUMNS):   else informat = strip(informat)!!strip(put(informl, best12.))!!'.';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else informat = strip(put(informl, best12.))!!'.'!!strip(put(informd, best12.));
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if informat ne '' then informat = strip(informat)!!'.';
+MPRINT(EMADVISECOLUMNS):   if idxusage = 'NONE' then index ="N";
+MPRINT(EMADVISECOLUMNS):   else index = "Y";
+MPRINT(EMADVISECOLUMNS):   indextype = idxusage;
+MPRINT(EMADVISECOLUMNS):   drop idxusage itype formatl formatd informl informd;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M08AFWET;
+MPRINT(EMADVISECOLUMNS):   length UNAME $64;
+MPRINT(EMADVISECOLUMNS):   set WORK.M08AFWET;
+MPRINT(EMADVISECOLUMNS):   UNAME = upcase(NAME);
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    proc sort data=WORK.M0UD9RVR NOTHREADS;
+MPRINT(EMADVISECOLUMNS):   by UNAME;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M0UD9RVR;
+MPRINT(EMADVISECOLUMNS):   drop UNAME;
+MPRINT(EMADVISECOLUMNS):   set WORK.M0UD9RVR;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M1Y0M4R9(keep=NAME ATTR);
+MPRINT(EMADVISECOLUMNS):   length ATTR $ 20;
+MPRINT(EMADVISECOLUMNS):   set WORK.M0UD9RVR;
+MPRINT(EMADVISECOLUMNS):   if level ne "INTERVAL" then do;
+MPRINT(EMADVISECOLUMNS):   if order = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'ORDER';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if format ne ' ' and formattype = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'FORMATTYPE';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if role = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'ROLE';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if level = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'LEVEL';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if type = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'TYPE';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if index = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'INDEX';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if report = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   attr = 'REPORT';
+MPRINT(EMADVISECOLUMNS):   output;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):   proc sort NOTHREADS;
+MPRINT(EMADVISECOLUMNS):   by attr;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M0UD9RVR;
+MPRINT(EMADVISECOLUMNS):   length NAME $64 ROLE $ 32 LEVEL $ 10 ORDER $ 8 CREATOR $32 FORMATTYPE $ 10 FAMILY $ 10 LOWERLIMIT 8 UPPERLIMIT 8 REPORT $1 DISTRIBUTION $ 20 COMMENT $64;
+MPRINT(EMADVISECOLUMNS):   length levelAssigned 8 roleAssigned 8 PRICE 8;
+MPRINT(EMADVISECOLUMNS):   set WORK.M0UD9RVR;
+MPRINT(EMADVISECOLUMNS):   if formattype = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if format ne ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if type = 'N' then do;
+MPRINT(EMADVISECOLUMNS):   pos = indexc(format,'.1234567890');
+MPRINT(EMADVISECOLUMNS):   if pos > 1 then tempfmt = substr(format,1, pos-1);
+MPRINT(EMADVISECOLUMNS):   else tempfmt = ' ';
+MPRINT(EMADVISECOLUMNS):   flen = length(tempfmt);
+MPRINT(EMADVISECOLUMNS):   select;
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("DATE" "DAY" "DDMMYY" "DOWNAME" "JULDAY" "JULIAN" "MMDDYY" "MMDDYYD" "MMDDYYC" "MMDDYYN" "MMDDYYP" "MMDDYYS" "MONNAME" "MONTH" "MONYY" "NENGO" "QTR" "QTRR" "WEEKDATE" "WEEKDATX" "WEEKDAY" "WORDDATE" "WORDDATX" 
+"YEAR" "YYMMDD" "YYMON" "YYMMDDC" "YYMMDDD" "YYMMDDN" "YYMMDDP" "YYMMDDS" "EURDFDE" "NJDATE" "NLDATE" "EURDFDD" "EURDFDWN" "EURDFMN" "EURDFMY" "EURDFWK" "EURDFWKX" "EURDFWDX" "EURDFDN" "EURDFDE" )) formattype = 'DATE';
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("DATETIME" "EURDFDT" "TOD" )) formattype = "DATETIME";
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("HHMM" "HOUR" "MMSS" "TIME" "TIMEAMPM" )) formattype = "TIME";
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("COMMA" "COMMAX" "DOLLAR" "DOLLARX" "E" "FRACT" "NEGPAREN" "PERCENT")) formattype="QUANTITY";
+MPRINT(EMADVISECOLUMNS):   when(tempfmt in ("BINARY" "HEX" "IB" "OCTAL" "PD" "PIB" "PK" "RB" "SSN" "Z" "ZD")) formattype = "CODING";
+MPRINT(EMADVISECOLUMNS):   otherwise do;
+MPRINT(EMADVISECOLUMNS):   formattype = "USER";
+MPRINT(EMADVISECOLUMNS):   if compress(tempfmt, '0123456789.', '') = '' then formattype='NUM';
+MPRINT(EMADVISECOLUMNS):   else if substr(tempfmt, 1, 6)='NLDATE' then formattype = "DATE";
+MPRINT(EMADVISECOLUMNS):   else if substr(tempfmt, 1, 6)='NLDATM' then formattype = "DATETIME";
+MPRINT(EMADVISECOLUMNS):   else if substr(tempfmt, 1, 4)='NLTIM' then formattype = "TIME";
+MPRINT(EMADVISECOLUMNS):   else if flen >= 4 then do;
+MPRINT(EMADVISECOLUMNS):   str = substr(tempfmt,1,4);
+MPRINT(EMADVISECOLUMNS):   if str in ("MMYY" "YYMM" "YYQR") then formattype ="DATE";
+MPRINT(EMADVISECOLUMNS):   else if str = "S370" then formattype = "CODING";
+MPRINT(EMADVISECOLUMNS):   else if str = "BEST" then formattype = "NUM";
+MPRINT(EMADVISECOLUMNS):   drop str;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if flen >=3 and substr(tempfmt,1,3) = "YYQ" then formatType = "DATE";
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   drop flen tempfmt pos;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else do;
+MPRINT(EMADVISECOLUMNS):   formatType = "CATEGORY";
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if formatType = "NUM" then do;
+MPRINT(EMADVISECOLUMNS):   if index = "Y" then formatType = "DISCRETE";
+MPRINT(EMADVISECOLUMNS):   else formatType = "QUANTITY";
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if level = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if formatType in ("CATEGORY", "CODING", "ID") or type = "C" then level = "NOMINAL";
+MPRINT(EMADVISECOLUMNS):   else level = "INTERVAL";
+MPRINT(EMADVISECOLUMNS):   levelAssigned = 1;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else level = upcase(level);
+MPRINT(EMADVISECOLUMNS):   if role = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   length name_prefix $8 _uname $64;
+MPRINT(EMADVISECOLUMNS):   drop name_prefix _uname _freqflag;
+MPRINT(EMADVISECOLUMNS):   retain _freqflag;
+MPRINT(EMADVISECOLUMNS):   if LENGTH> 80 then ROLE = 'TEXT';
+MPRINT(EMADVISECOLUMNS):   _uname = upcase(NAME);
+MPRINT(EMADVISECOLUMNS):   select(_uname);
+MPRINT(EMADVISECOLUMNS):   when('_PARTIND_') do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'ID';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   when('_WARN_') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_SEGMENT') do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'SEGMENT';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   when('_NODE_') do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'SEGMENT';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   when('EM_CLASSTARGET') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_VALUETARGET') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_PREDICTION') ROLE = 'PREDICT';
+MPRINT(EMADVISECOLUMNS):   when('EM_PROBABILITY') ROLE = 'PREDICT';
+MPRINT(EMADVISECOLUMNS):   when('EM_EVENTPROBABILITY') ROLE = 'PREDICT';
+MPRINT(EMADVISECOLUMNS):   when('EM_CLASSIFICATION') ROLE = 'CLASSIFICATION';
+MPRINT(EMADVISECOLUMNS):   when('EM_DECISION') ROLE = 'DECISION';
+MPRINT(EMADVISECOLUMNS):   when('EM_PROFIT') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_LOSS') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('EM_ROI') ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   when('URI') ROLE = 'URL';
+MPRINT(EMADVISECOLUMNS):   when('FILTERED') ROLE = 'TEXTLOC';
+MPRINT(EMADVISECOLUMNS):   otherwise do;
+MPRINT(EMADVISECOLUMNS):   if upcase(NAME) =: 'ZIP' then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'REJECTED';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   COMMENT = 'Rejected by: Exceed the maximum class level of %s';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if upcase(NAME) in('FREQ', 'FREQUENCY') then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'FREQ';
+MPRINT(EMADVISECOLUMNS):   if TYPE = 'C' then ROLE = 'INPUT';
+MPRINT(EMADVISECOLUMNS):   else if _freqflag =1 then ROLE='REJECTED';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else do;
+MPRINT(EMADVISECOLUMNS):   name_prefix = scan(_uname, 1, '_');
+MPRINT(EMADVISECOLUMNS):   if scan(_uname, 2, '_') = '' then name_prefix='';
+MPRINT(EMADVISECOLUMNS):   if name_prefix in('F', 'I', 'U') then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'CLASSIFICATION';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if name_prefix in('Q') then ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   else if name_prefix in('P', 'V') then ROLE = 'PREDICT';
+MPRINT(EMADVISECOLUMNS):   else if name_prefix in('R', 'RS', 'RT', 'RD', 'RDS', 'RDT', 'RA', 'RAS', 'RAT') then ROLE = 'RESIDUAL';
+MPRINT(EMADVISECOLUMNS):   else if name_prefix ='D' then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'DECISION';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if name_prefix ='B' then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'SEGMENT';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else if name_prefix in('EP', 'BP', 'CP', 'EL', 'CL', 'BL', 'W', 'ROI', 'IC') then ROLE = 'ASSESS';
+MPRINT(EMADVISECOLUMNS):   else do;
+MPRINT(EMADVISECOLUMNS):   array _ROLE_ (19) $32 _TEMPORARY_ ('ASSESS','CLASSIFICATION','CENSOR', 'COST', 'CROSSID', 'DECISION', 'ID','INPUT', 'LABEL', 'MISSING','PREDICT','REFERRER','REJECTED', 'RESIDUAL','SEGMENT', 'SEQUENCE','TARGET', 'TEXT', 'TIMEID');
+MPRINT(EMADVISECOLUMNS):   drop _found_ i;
+MPRINT(EMADVISECOLUMNS):   _found_=0;
+MPRINT(EMADVISECOLUMNS):   do i=1 to 19 until(_found_=1);
+MPRINT(EMADVISECOLUMNS):   if index(_uname, trim(_ROLE_{i}))=1 then do;
+MPRINT(EMADVISECOLUMNS):   ROLE=_ROLE_{i};
+MPRINT(EMADVISECOLUMNS):   if ROLE = 'ID' then LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   else if ROLE = 'SEGMENT' then LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   else if ROLE = 'TIMEID' and TYPE='N' then LEVEL = 'INTERVAL';
+MPRINT(EMADVISECOLUMNS):   _found_=1;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if length(_uname)>2 then do;
+MPRINT(EMADVISECOLUMNS):   if substr(reverse(trim(_uname)), 1, 3) = 'DI_' then do;
+MPRINT(EMADVISECOLUMNS):   ROLE = 'ID';
+MPRINT(EMADVISECOLUMNS):   LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if ROLE='FREQ' then _freqflag=1;
+MPRINT(EMADVISECOLUMNS):   else if ROLE = 'CLASSIFICATION' then LEVEL = 'NOMINAL';
+MPRINT(EMADVISECOLUMNS):   if symexist('RATEMKG_ROLE') then do;
+MPRINT(EMADVISECOLUMNS):   if upcase(symget('RATEMKG_ROLE')) in('Y', 'YES') then do;
+MPRINT(EMADVISECOLUMNS):   if _uname =: 'POLICY' then ROLE = 'POLICYID';
+MPRINT(EMADVISECOLUMNS):   else if _uname in ('PARTITION', '_PARTIND_') then ROLE = 'PARTITION';
+MPRINT(EMADVISECOLUMNS):   else if type = 'N' then do;
+MPRINT(EMADVISECOLUMNS):   if _uname = 'EXPOSURE' then ROLE = 'EXPOSURE';
+MPRINT(EMADVISECOLUMNS):   else if _uname = 'YEAR' then ROLE = 'YEAR';
+MPRINT(EMADVISECOLUMNS):   else if _uname = 'WEIGHT' then ROLE = 'WEIGHT';
+MPRINT(EMADVISECOLUMNS):   else if _uname = 'OFFSET' then ROLE = 'OFFSET';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   if role = ' ' then do;
+MPRINT(EMADVISECOLUMNS):   if formattype in('DATE', 'DATETIME', 'TIME') then role = 'TIMEID';
+MPRINT(EMADVISECOLUMNS):   else role = 'INPUT';
+MPRINT(EMADVISECOLUMNS):   roleAssigned = 1;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   else role = upcase(role);
+MPRINT(EMADVISECOLUMNS):   if REPORT = '' then REPORT = 'N';
+MPRINT(EMADVISECOLUMNS):   if symexist('dmwb_product') then do;
+MPRINT(EMADVISECOLUMNS):   if upcase(symget('dmwb_product')) = 'FACTORYMINER_DATASOURCE' then do;
+MPRINT(EMADVISECOLUMNS):   if ROLE ^in('INPUT', 'TARGET', 'REJECTED', 'SEGMENT', 'FREQ', 'ID', 'KEY') then ROLE='REJECTED';
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   end;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):    data WORK.M0UD9RVR;
+MPRINT(EMADVISECOLUMNS):   set WORK.M0UD9RVR;
+MPRINT(EMADVISECOLUMNS):   label NAME = "Variable Name" TYPE = "Type" ROLE = "Role" LEVEL= "Measurement Level" ORDER= "Order" CREATOR= "Creator" FORMATTYPE= "Format Type" FAMILY= "Family" DISTRIBUTION= "Distribution" PRICE= "Price" LOWERLIMIT= "Lower 
+limit" UPPERLIMIT= "Upper Limit" REPORT= "Report" COMMENT= "Comment" INDEX= "Index" INDEXTYPE= "IndexType" LABEL= "Label" LENGTH= "Length";
+MPRINT(EMADVISECOLUMNS):   drop levelAssigned roleAssigned;
+MPRINT(EMADVISECOLUMNS):   run;
+MPRINT(EMADVISECOLUMNS):   
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   proc sort data=WORK.COLUMNMETA;
+MPRINT(EM_DIAGRAM):   by NAME;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * &nodeid: Merge incoming metadata;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   proc contents data=EMWS3.Ids_DATA noprint out=_temp2(keep=NAME);
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   proc sort data=_temp2;
+MPRINT(EM_DIAGRAM):   by NAME;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   proc sort data=EMWS3.Ids_CMeta_DATA out=_temp;
+MPRINT(EM_DIAGRAM):   by NAME;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   data EMWS3.Link_CMeta_TRANSACTION;
+MPRINT(EM_DIAGRAM):   merge WORK.COLUMNMETA(in=_a) _temp2(in=_b) _temp(drop=FORMAT INFORMAT LENGTH INDEX INDEXTYPE in=_c) end=_eof_;
+MPRINT(EM_DIAGRAM):   by NAME;
+MPRINT(EM_DIAGRAM):   if (^_a and _b) or (^_c and _a and _b) then delete;
+MPRINT(EM_DIAGRAM):   if ^_b then CREATOR = "Link";
+MPRINT(EM_DIAGRAM):   run;
+NOTE: View EMWS3.LINK_TRANSACTION.VIEW used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+MPRINT(EM_DIAGRAM):    proc printto;
+MPRINT(EM_DIAGRAM):   run;

@@ -1,0 +1,67 @@
+*------------------------------------------------------------*
+User:                jmmorr01
+Date:                November 13, 2018
+Time:                10:31:39
+*------------------------------------------------------------*
+* Training Output
+*------------------------------------------------------------*
+ 
+ 
+ 
+ 
+Variable Summary
+ 
+            Measurement    Frequency
+Role           Level         Count
+ 
+ID           NOMINAL           1
+INPUT        NOMINAL           1
+SEQUENCE     INTERVAL          1
+TARGET       NOMINAL           1
+ 
+ 
+ 
+ 
+ 
+The OPTGRAPH Procedure
+ 
+      Performance Information
+ 
+Execution Mode       Single-Machine
+Number of Threads                 2
+ 
+ 
+ 
+ 
+ 
+The OPTGRAPH Procedure
+ 
+         Problem Summary
+ 
+Input Type                   Graph
+Number of Nodes                 35
+Number of Links                111
+Graph Direction           Directed
+ 
+ 
+ 
+ 
+ 
+The OPTGRAPH Procedure
+ 
+       Solution Summary
+ 
+Problem Type         Centrality
+Solution Status              OK
+CPU Time                   0.00
+Real Time                  0.02
+
+
+*------------------------------------------------------------*
+* Score Output
+*------------------------------------------------------------*
+
+
+*------------------------------------------------------------*
+* Report Output
+*------------------------------------------------------------*

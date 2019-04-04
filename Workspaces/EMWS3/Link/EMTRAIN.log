@@ -1,0 +1,1855 @@
+MPRINT(EM_DIAGRAM):    data _null_;
+MPRINT(EM_DIAGRAM):   call symput('NLDATE', strip(put(date(), NLDATE.)));
+MPRINT(EM_DIAGRAM):   call symput('NLTIME', strip(put(datetime(), NLTIME.)));
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   data _null_;
+MPRINT(EM_DIAGRAM):   nldate= sasmsg("sashelp.dmine", "log_date_note", 'N', "November 13, 2018" );
+MPRINT(EM_DIAGRAM):   nltime= sasmsg("sashelp.dmine", "log_time_note", 'N', "10:31:27" );
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   put "* Training Log";
+MPRINT(EM_DIAGRAM):   put nldate;
+MPRINT(EM_DIAGRAM):   put nltime;
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   run;
+*------------------------------------------------------------*
+* Training Log
+Date:                November 13, 2018
+Time:                10:31:27
+*------------------------------------------------------------*
+MPRINT(EM_DIAGRAM):    filename O28KR_M3 "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMTRAIN.out" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):   proc printto print=O28KR_M3 new;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    filename _LOG "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMLOG.log" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):    data _null_;
+MPRINT(EM_DIAGRAM):   call symput('NLDATE', strip(put(date(), NLDATE.)));
+MPRINT(EM_DIAGRAM):   call symput('NLTIME', strip(put(datetime(), NLTIME.)));
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   data _null_;
+MPRINT(EM_DIAGRAM):   nldate= sasmsg("sashelp.dmine", "log_date_note", 'N', "November 13, 2018" );
+MPRINT(EM_DIAGRAM):   nltime= sasmsg("sashelp.dmine", "log_time_note", 'N', "10:31:27" );
+MPRINT(EM_DIAGRAM):   file _LOG;
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   put "User:                jmmorr01";
+MPRINT(EM_DIAGRAM):   put nldate;
+MPRINT(EM_DIAGRAM):   put nltime;
+MPRINT(EM_DIAGRAM):   put "Site:                70080761";
+MPRINT(EM_DIAGRAM):   put "Platform:            X64_8PRO";
+MPRINT(EM_DIAGRAM):   put "Maintenance Release: 9.04.01M3P062415";
+MPRINT(EM_DIAGRAM):   put "EM Version:          14.1";
+MPRINT(EM_DIAGRAM):   put "* ";
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    filename _LOGIN "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMTRAIN.log" encoding="UTF-8" NOBOM;
+MPRINT(EM_COPYFILE):   data _null_;
+MPRINT(EM_COPYFILE):   length line $20000;
+MPRINT(EM_COPYFILE):   file _LOG MOD lrecl=20000;
+MPRINT(EM_COPYFILE):   fid=fopen("_LOGIN",'i',20000,'v');
+MPRINT(EM_COPYFILE):   if fid > 0 then do;
+MPRINT(EM_COPYFILE):   do while(^fread(fid));
+MPRINT(EM_COPYFILE):   rlen = frlen(fid);
+MPRINT(EM_COPYFILE):   rc= fget(fid,line,20000);
+MPRINT(EM_COPYFILE):   start = length(line)-length(left(line))+1;
+MPRINT(EM_COPYFILE):   line=strip(line);
+MPRINT(EM_COPYFILE):   put @start line;
+MPRINT(EM_COPYFILE):   end;
+MPRINT(EM_COPYFILE):   if fid > 0 then rc=fclose(fid);
+MPRINT(EM_COPYFILE):   end;
+MPRINT(EM_COPYFILE):   run;
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   filename _LOGIN;
+MPRINT(EM_DIAGRAM):    data _null_;
+MPRINT(EM_DIAGRAM):   file _LOG mod;
+MPRINT(EM_DIAGRAM):   put _page_;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   filename _LOGIN "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMSCORE.log" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   data _null_;
+MPRINT(EM_DIAGRAM):   file _LOG mod;
+MPRINT(EM_DIAGRAM):   put _page_;
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    filename _LOGIN "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMREPORT.log" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   filename _LOGIN;
+MPRINT(EM_DIAGRAM):    filename _LOG;
+MPRINT(EM_DIAGRAM):    filename _OUT "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMOUTPUT.out" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):    data _null_;
+MPRINT(EM_DIAGRAM):   call symput('NLDATE', strip(put(date(), NLDATE.)));
+MPRINT(EM_DIAGRAM):   call symput('NLTIME', strip(put(datetime(), NLTIME.)));
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   data _null_;
+MPRINT(EM_DIAGRAM):   nldate= sasmsg("sashelp.dmine", "log_date_note", 'N', "November 13, 2018" );
+MPRINT(EM_DIAGRAM):   nltime= sasmsg("sashelp.dmine", "log_time_note", 'N', "10:31:27" );
+MPRINT(EM_DIAGRAM):   file _OUT;
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   put "User:                jmmorr01";
+MPRINT(EM_DIAGRAM):   put nldate;
+MPRINT(EM_DIAGRAM):   put nltime;
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   put "* Training Output";
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    filename _OUTIN "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMTRAIN.out" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):   ;
+MPRINT(EM_COPYFILE):   data _null_;
+MPRINT(EM_COPYFILE):   length line $20000;
+MPRINT(EM_COPYFILE):   file _OUT MOD lrecl=20000;
+MPRINT(EM_COPYFILE):   fid=fopen("_OUTIN",'i',20000,'v');
+MPRINT(EM_COPYFILE):   if fid > 0 then do;
+MPRINT(EM_COPYFILE):   do while(^fread(fid));
+MPRINT(EM_COPYFILE):   rlen = frlen(fid);
+MPRINT(EM_COPYFILE):   rc= fget(fid,line,20000);
+MPRINT(EM_COPYFILE):   start = length(line)-length(left(line))+1;
+MPRINT(EM_COPYFILE):   line=strip(line);
+MPRINT(EM_COPYFILE):   put @start line;
+MPRINT(EM_COPYFILE):   end;
+MPRINT(EM_COPYFILE):   if fid > 0 then rc=fclose(fid);
+MPRINT(EM_COPYFILE):   end;
+MPRINT(EM_COPYFILE):   run;
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   filename _OUTIN;
+MPRINT(EM_DIAGRAM):    data _null_;
+MPRINT(EM_DIAGRAM):   file _OUT mod;
+MPRINT(EM_DIAGRAM):   put _page_;
+MPRINT(EM_DIAGRAM):   put // "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   put "* Score Output";
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    filename _OUTIN "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMSCORE.out" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   filename _OUTIN;
+MPRINT(EM_DIAGRAM):    data _null_;
+MPRINT(EM_DIAGRAM):   file _OUT mod;
+MPRINT(EM_DIAGRAM):   put _page_;
+MPRINT(EM_DIAGRAM):   put // "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   put "* Report Output";
+MPRINT(EM_DIAGRAM):   put "*------------------------------------------------------------*";
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):    filename _OUTIN "J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMREPORT.out" encoding="UTF-8" NOBOM;
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   filename _OUTIN;
+MPRINT(EM_DIAGRAM):    filename _OUT;
+MPRINT(EM_DIAGRAM):    filename _emtool_ 'J:\JMMORR01\CIS 445\CIS 445 Tutorial 3\Workspaces\EMWS3\Link\EMRUNSTATUS.xml' encoding="UTF-8" NOBOM;
+28028      proc freq data=EMWS3.Link_VariableSet noprint;
+MPRINT(EM_DIAGRAM):    proc freq data=EMWS3.Link_VariableSet noprint;
+28029      table ROLE*LEVEL/out=WORK.LinkMETA;
+MPRINT(EM_DIAGRAM):   table ROLE*LEVEL/out=WORK.LinkMETA;
+28030      run;
+MPRINT(EM_DIAGRAM):   run;
+
+NOTE: There were 4 observations read from the data set EMWS3.LINK_VARIABLESET.
+NOTE: The data set WORK.LINKMETA has 4 observations and 4 variables.
+NOTE: PROCEDURE FREQ used (Total process time):
+      real time           0.09 seconds
+      cpu time            0.03 seconds
+      
+
+28031      proc print data=WORK.LinkMETA label noobs;
+MPRINT(EM_DIAGRAM):   proc print data=WORK.LinkMETA label noobs;
+28032      var ROLE LEVEL COUNT;
+MPRINT(EM_DIAGRAM):   var ROLE LEVEL COUNT;
+28033      label ROLE = "%sysfunc(sasmsg(sashelp.dmine, meta_role_vlabel, NOQUOTE))" LEVEL = "%sysfunc(sasmsg(sashelp.dmine, meta_level_vlabel, NOQUOTE))" COUNT = "%sysfunc(sasmsg(sashelp.dmine, rpt_count_vlabel, NOQUOTE))";
+MPRINT(EM_DIAGRAM):   label ROLE = "Role" LEVEL = "Measurement Level" COUNT = "Frequency Count";
+28034      title9 ' ';
+MPRINT(EM_DIAGRAM):   title9 ' ';
+28035      title10 "%sysfunc(sasmsg(sashelp.dmine, rpt_varSummary_title  , NOQUOTE))";
+MPRINT(EM_DIAGRAM):   title10 "Variable Summary";
+MPRINT(EM_DIAGRAM):   run;
+28036      run;
+
+NOTE: There were 4 observations read from the data set WORK.LINKMETA.
+NOTE: The PROCEDURE PRINT printed page 4.
+NOTE: PROCEDURE PRINT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+28037      title10;
+MPRINT(EM_DIAGRAM):   title10;
+28038      %let EMEXCEPTIONSTRING=;
+MPRINT(EM_DIAGRAM):     *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Link: Generation of macros and macro variables;
+MPRINT(EM_DIAGRAM):   * To see the code generated, set the EM_DEBUG macro variable to SOURCE or _ALL_;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Link: EM Macro Variables and Macros;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------* ;
+MPRINT(EM_DIAGRAM):   * System Macro Variables;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------* ;
+MPRINT(EM_DIAGRAM):   data _null_;
+MPRINT(EM_DIAGRAM):   length string $2000;
+MPRINT(EM_DIAGRAM):   string = 'CIS 445 Tutorial 3';
+MPRINT(EM_DIAGRAM):   call symput('EM_PROJECTNAME', trim(string));
+MPRINT(EM_DIAGRAM):   string = 'Link Analysis';
+MPRINT(EM_DIAGRAM):   call symput('EM_WSNAME', trim(string));
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------* ;
+MPRINT(EM_DIAGRAM):   * Properties Macro Variables ;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------* ;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Files Macro Variables;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Import Macro Variables;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Export Macro Variables;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Decision Macro Variables;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Statement Macro Variables;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   data _null_;
+MPRINT(EM_DIAGRAM):   set EMWS3.Ids_EMINFO;
+MPRINT(EM_DIAGRAM):   where key in('HPDMSAMPLE', 'IDSTABLE');
+MPRINT(EM_DIAGRAM):   if key = 'HPDMSAMPLE' then call symput('_ForceGrid', '1');
+MPRINT(EM_DIAGRAM):   else call symput('_IDS_TABLE', DATA);
+MPRINT(EM_DIAGRAM):   run;
+MPRINT(HPDM_PERFORMANCE):  ;
+PERFORMANCE  DETAILS
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Variable Macros;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * General Variable Macros;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Target Variable Macros;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Input Variable Macros;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Rejected Variable Macros;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * Misc Variable Macros;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * End Create EM Macro Variables and Macros;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+28414      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):    *------------------------------------------------------------*;
+28415      * Link: Generation of macros and macro variables;
+MPRINT(EM_DIAGRAM):   * Link: Generation of macros and macro variables;
+28416      * To see the code generated, set the EM_DEBUG macro variable to SOURCE or _ALL_;
+MPRINT(EM_DIAGRAM):   * To see the code generated, set the EM_DEBUG macro variable to SOURCE or _ALL_;
+28417      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+
+28418      %let EMEXCEPTIONSTRING=;
+28419      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):    *------------------------------------------------------------*;
+28420      * TRAIN: Link;
+MPRINT(EM_DIAGRAM):   * TRAIN: Link;
+28421      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+28422      %let EM_ACTION = TRAIN;
+28423      %let syscc = 0;
+28424      %MACRO EM_LINKANALYSIS_MAIN;
+28425        filename temp catalog 'sashelp.emexpl.link_macros.source';
+28426            %include temp;
+28427        filename temp;
+28428      
+28429         %if %upcase(&EM_ACTION) = CREATE %then %do;
+28430          filename temp catalog 'sashelp.emexpl.link_create.source';
+28431            %include temp;
+28432          filename temp;
+28433          %EM_LINKANALYSIS_CREATE;
+28434         %end;
+28435      
+28436         %if %upcase(&EM_ACTION) = TRAIN %then %do;
+28437          filename temp catalog 'sashelp.emexpl.link_train.source';
+28438             %include temp;
+28439            filename temp;
+28440          %EM_LINKANALYSIS_TRAIN;
+28441        %end;
+28442      
+28443         %if %upcase(&EM_ACTION) = SCORE %then %do;
+28444          filename temp catalog 'sashelp.emexpl.link_score.source';
+28445          %include temp;
+28446          filename temp;
+28447          %EM_LINKANALYSIS_SCORE;
+28448        %end;
+28449      
+28450         %if %upcase(&EM_ACTION) = REPORT %then %do;
+28451          filename temp catalog 'sashelp.emexpl.link_report.source';
+28452          %include temp;
+28453          filename temp;
+28454          %EM_LINKANALYSIS_REPORT;
+28455        %end ;
+28456      %MEND EM_LINKANALYSIS_MAIN;
+28457      
+28458      %EM_LINKANALYSIS_MAIN;
+MPRINT(EM_DIAGRAM):    
+MPRINT(EM_LINKANALYSIS_MAIN):   filename temp catalog 'sashelp.emexpl.link_macros.source';
+NOTE: %INCLUDE (level 1) file TEMP is file SASHELP.EMEXPL.LINK_MACROS.SOURCE.
+28459     +%macro em_linkan_nobs(ds);
+28460     +  %let dsID = %sysfunc(open(&ds));
+28461     +  %if &dsID %then %do;
+28462     +    %let nObs = %sysfunc(attrn(&dsID,nlobsf));
+28463     +    %let rc   = %sysfunc(close(&dsID));
+28464     +  %end;
+28465     +  &nObs
+28466     +%mend em_linkan_nobs;
+28469     +%macro em_linkan_appendfiles(fileref1, fileref2);/*append fileref2 to fileref1;*/
+28470     +     data _null_;
+28471     +       length c $256;
+28472     +       fid1=fopen("&fileref1",'A');
+28473     +       fid2=fopen("&fileref2",'I');
+28474     +       cval = finfo(fid2,'lrecl');
+28475     +       put cval= fid1= fid2=;
+28476     +       if (fid2 > 0) then
+28477     +         do while(fread(fid2)=0);
+28478     +           rc = fget(fid2,c,256);
+28479     +           _msg_=sysmsg();
+28480     +           /* put rc= c= _msg_=; */
+28481     +           rc = fput(fid1,strip(c));
+28482     +           rc = fwrite(fid1);
+28483     +         end;
+28484     +         _msg_=sysmsg();
+28485     +         put _msg_=;
+28486     +       rc = fclose(fid1);
+28487     +       rc = fclose(fid2);
+28488     +     run;
+28489     +%mend em_linkan_appendfiles;
+28491     +%macro em_linkan_getnodesfromlinks(nodes=,links=,lookupnodes=, samegroup=Y);
+28492     +   %if %upcase(&samegroup)= N %then %do;
+28493     +        %let idv=%EM_ID;
+28494     +        %let target=%EM_TARGET;
+28495     +    %end;
+28497     +    proc sql;
+28498     +          create table _node1 as
+28499     +            select distinct from as node %if %upcase(&samegroup)= N %then %do; , "&idv" as _group %end;
+28500     +            from &links;
+28501     +          create table _node2 as
+28502     +            select distinct to as node %if %upcase(&samegroup)= N %then %do; , "&target" as _group %end;
+28503     +            from &links;
+28504     +    quit;
+28506     +   %if %upcase(&samegroup)= Y %then %do;
+28507     +    proc sql;
+28508     +      create table _nodes_tmp as
+28509     +        select node
+28510     +        from _node1
+28511     +       UNION
+28512     +        select node
+28513     +        from _node2;
+28514     +    quit;
+28516     +    proc sql;
+28517     +    create table &nodes as
+28518     +     select b.*
+28519     +      from _nodes_tmp as a
+28520     +          LEFT JOIN
+28521     +           &lookupnodes as b
+28522     +        on a.node = b.node;
+28523     +    quit;
+28524     +    %end;
+28527     +   %if %upcase(&samegroup)= N %then %do;
+28528     +    data &nodes;
+28529     +          retain node _group _group_ind;
+28530     +          format _group $32.;
+28531     +          set _node1 _node2;
+28532     +          if _group="&idv" then _group_ind=1;
+28533     +          if _group="&target" then _group_ind=2;
+28534     +    run;
+28535     +    %end;
+28537     +     proc datasets lib=work nolist;
+28538     +         delete _node1 _node2 %if %upcase(&samegroup)= Y %then %do; _nodes_tmp %end;
+28539     +         ;
+28540     +    run;
+28541     +    quit;
+28543     +%mend;
+28545     +%macro  em_linkan_transpose(data=,
+28546     +                            trans=,
+28547     +                            binout=,
+28548     +                            binnum=,
+28549     +                            lookup=
+28550     +                            );
+28552     +  /*------------------------- Bin interval vars---------------------------- */
+28553     +  %if %eval(&EM_NUM_INTERVAL_INPUT+&EM_NUM_INTERVAL_REJECTED+&EM_NUM_INTERVAL_TARGET) > 0  %then %do;
+28554     +            /*   Use Binning macro      */
+28555     +             %em_getname(key=BINNINGCODE, type=file);
+28556     +             %if "&EM_PROPERTY_BINMETHOD"="BUCKET" %then %do;
+28557     +                 filename temp1 catalog 'sashelp.emapps.bucket_binning.source';
+28558     +             %end;
+28560     +             %if "&EM_PROPERTY_BINMETHOD"="QUANTILE" %then %do;
+28561     +                 filename temp1 catalog 'sashelp.emapps.quantile_binning.source';
+28562     +             %end;
+28564     +             %include temp1;
+28565     +             filename temp1;
+28566     +             filename X "&EM_USER_BINNINGCODE";
+28569     +            /* Create a temporary varset, change role to "INPUT" if (role="REJECTED" and use= Y)*/
+28570     +            data _tmp_varset;
+28571     +                set &EM_DATA_VARIABLESET;
+28572     +                if upcase(role) = "REJECTED" and upcase(use) = "Y" and upcase(level) = "INTERVAL"
+28573     +                    then role = "INPUT";
+28574     +            run;
+28577     +             %if "&EM_PROPERTY_BINMETHOD"="BUCKET" %then %do;
+28578     +                %em_apps_bucket_binning(&EM_IMPORT_DATA, _tmp_varset, &binnum, &EM_USER_BINMAPPINGS, %str(X) , dropOriginal=N, IncludeTarget=Y);
+28579     +             %end;
+28580     +             %if "&EM_PROPERTY_BINMETHOD"="QUANTILE" %then %do;
+28581     +                %em_apps_quantile_binning(&EM_IMPORT_DATA, _tmp_varset, &binnum, &EM_USER_BINMAPPINGS, %str(X) , dropOriginal=N, IncludeTarget=Y);
+28582     +             %end;
+28584     +            /*Get binned data */
+28585     +             data &binout; /*will keep all original data*/
+28586     +                  set &data(keep = %EM_BINARY_INPUT %EM_NOMINAL_INPUT %EM_ORDINAL_INPUT  %EM_INTERVAL_INPUT
+28587     +                       %EM_BINARY_REJECTED %EM_NOMINAL_REJECTED %EM_ORDINAL_REJECTED  %EM_INTERVAL_REJECTED
+28588     +                       %EM_TARGET) ;
+28589     +                  %inc X;
+28590     +              run;
+28593     +              proc print data=&binout;run;
+28594     +             filename X;
+28595     +  %end;
+28596     +  %else %do;             /*No interval vars */
+28597     +            data &binout;
+28598     +                 set &data(keep = %EM_BINARY_INPUT %EM_NOMINAL_INPUT %EM_ORDINAL_INPUT
+28599     +                       %EM_BINARY_REJECTED %EM_NOMINAL_REJECTED %EM_ORDINAL_REJECTED
+28600     +                       %EM_TARGET) ;
+28601     +           run;
+28602     +  %end;
+28604     +  proc contents data = &binout(drop=%EM_INTERVAL_INPUT   %EM_INTERVAL_REJECTED  %EM_INTERVAL_TARGET) out = varsdata(keep =  name) noprint;
+28605     +  run;
+28607     +  proc sql noprint;
+28608     +      select count(*) into :_numvars from varsdata;
+28609     +      select name into :var1-:var%left(&_numvars) from varsdata order by name;
+28610     +  quit;
+28614     +/*Create Transactional data from binout */
+28615     +  data &trans.;
+28616     +      set &binout(drop=%EM_INTERVAL_INPUT   %EM_INTERVAL_REJECTED  %EM_INTERVAL_TARGET);
+28617     +      format  tmpstr $100. item $100. level $100. _category $32.;
+28618     +      drop tmpstr;
+28619     +        %do i = 1 %to &_numvars ;
+28620     +            newid=_N_;            /*Customer Id */
+28621     +            tmpstr=cats(&&&&var&i);
+28622     +            if tmpstr eq ' '    /*If variable has a missing level*/
+28623     +            then do;
+28624     +                 item = catx('_',SYMGET('var'||LEFT(&i)),'.');
+28625     +                 level='.';
+28626     +            end;
+28627     +            else do;
+28628     +                 item = catx('_',SYMGET('var'||LEFT(&i)),&&&&var&i);
+28629     +                 level=tmpstr;
+28630     +            end;
+28631     +          _category=  "&&var&i." ;/*Original Var info*/
+28632     +         * _category_ind= &i;
+28633     +          output ;
+28634     +        %end;
+28635     +       keep newid item level _category;
+28636     +  run;
+28638     +  proc sql;
+28639     +      create table &lookup as
+28640     +      select distinct Item, level, _category, "%sysfunc(sasmsg(sashelp.dmine,lnka_level_valuelabel, noquote))" as _group
+28641     +       from &trans;
+28642     +  quit;
+28646     +  /*--- delete binout ----*/
+28647     +  proc delete data= &binout;run;
+28648     +  proc delete data= varsdata ;run;
+28650     +%mend em_linkan_transpose;
+28653     +%macro em_linkan_TransAsNodesLinks(indata = ,
+28654     +                                    idv=,
+28655     +                                    target=,
+28656     +                                    freq=,
+28657     +                                    outnodes=,
+28658     +                                    outlinks=
+28659     +                                    );             /*Explore Transactional Data: User(From)->Product(To)*/
+28661     +  /*idv: customer; target: target*/
+28662     +  data &outlinks;
+28663     +      set &indata;
+28664     +      format from $100. to $100.;
+28665     +      from = cats(&idv);
+28666     +      to  = cats(&target);
+28667     +      drop &idv &target;
+28668     +      %if &freq eq %then %do;
+28669     +      weight=1;
+28670     +      %end;
+28671     +        %if &freq ne %then %do;
+28672     +            rename &freq=weight ;
+28673     +        %end;
+28674     +      linkid=_N_;
+28675     +  run;
+28677     +   proc sql noprint;
+28678     +       select count(*) into: translinkrows
+28679     +       from &outlinks;
+28680     +   quit;
+28682     +  %if &translinkrows>10000 %then %do;/*exception handling for links data that exceeds the row download limit of 20k */
+28683     +       /*Keep only top 10k rows of links data*/
+28684     +      data &outlinks;
+28685     +         set &outlinks(obs=10000);
+28686     +      run;
+28687     +  %end;
+28689     +  %em_linkan_getnodesfromlinks(nodes=&outnodes,links=&outlinks,lookupnodes=, samegroup=N);
+28690     +/*
+28691     +  data &outlinks;
+28692     +   set &outlinks;
+28693     +   rename from=&idv to=&target;
+28694     +  run;*/
+28696     +%mend  em_linkan_TransAsNodesLinks;
+28699     +%macro em_linkan_TransToGraph_AssocSeq(indata =,
+28700     +                                       nodes=,
+28701     +                                       links=,
+28702     +                                       same=,
+28703     +                                       window=,
+28704     +                                       idv=,
+28705     +                                       target=,
+28706     +                                       seq=,
+28707     +                                       seqsuptype=,
+28708     +                                       seqsupport=,
+28709     +                                       assocsuptype=,
+28710     +                                       assocsupport=
+28711     +                                      );
+28713     +       %em_getname(key=SORTEDTRANS, type=data);
+28714     +       %em_getname(key=TRANSACTION, type=data);
+28715     +       %em_getname(key=RecdRules, type=data);
+28718     +       proc sort data=&indata out=&EM_USER_SORTEDTRANS;
+28719     +            by &idv;
+28720     +       run;
+28722     +       data &EM_USER_SORTEDTRANS;        /*need to make sure targret is char*/
+28723     +            set  &EM_USER_SORTEDTRANS;
+28724     +            chartarget=cats(&target);
+28725     +            drop &target;
+28726     +            rename chartarget=&target;
+28727     +       run;
+28729     +       proc dmdb batch data=&EM_USER_SORTEDTRANS dmdbcat=cat;
+28730     +            id &idv &seq;
+28731     +            class &target(desc);
+28732     +       run;
+28735     +       /*--- If there is no sequence var in transactional data, or raw/train data ----*/
+28737     +       %if (&seq. eq ) or ("&indata"="&EM_USER_TRANSACTION") %then %do;
+28739     +            proc assoc data=&EM_USER_SORTEDTRANS dmdbcat=cat out=aout items=2
+28740     +                        %if "&assocsuptype"="PERCENT" %then %do;
+28741     +                        pctsup=&assocsupport
+28742     +                        %end;
+28743     +                        %if "&assocsuptype"="COUNT" %then %do;
+28744     +                        support =&assocsupport
+28745     +                        %end;
+28746     +                ;
+28747     +                cust &idv ;
+28748     +                target &target;
+28749     +            run;
+28753     +             /*obs 2 to &nodeobs: one item set; &nodeobs+1 to &linkobs: two items set*/
+28754     +            proc sql noprint;
+28755     +                  select count(*) into :nodeobs from aout
+28756     +                  where item2 is missing;
+28757     +                  select count(*) into :linkobs from aout
+28758     +                 ;
+28759     +            quit;
+28761     +            %let linkfirobs=%eval(&nodeobs.+1);
+28763     +             /*------ Exception string : check if two item sets exist at current support level ----*/
+28764     +            %if &linkobs. le &linkfirobs. %then %do;
+28765     +                  %let EMEXCEPTIONSTRING = exception.server.lnka.resetsupportlevelerr;
+28766     +                  %put &em_codebar;
+28767     +                  %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.resetsupportlevel_err, noquote));
+28768     +                  %put &errormsg;
+28769     +                  %put &em_codebar;
+28770     +                  %let errorflag=&errorflag+1;
+28771     +                  %return;
+28772     +            %end;
+28774     +            proc rulegen in=aout out=_ruleout(where =(set_size=2)) minconf=&EM_PROPERTY_MINCONF;
+28775     +            run;
+28777     +            /*------ Exception string : check nobs at _ruleout , if no obs, need to reset confidence level  ----*/
+28779     +            %if %em_linkan_nobs(_ruleout) = 0 %then %do;
+28780     +                  %let EMEXCEPTIONSTRING = exception.server.lnka.resetconflevelerr;
+28781     +                  %put &em_codebar;
+28782     +                  %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.resetconflevel_err, noquote));
+28783     +                  %put &errormsg;
+28784     +                  %put &em_codebar;
+28785     +                  %let errorflag=&errorflag+1;
+28786     +                  %return;
+28787     +            %end;
+28789     +           /*Get undirected graph*/
+28790     +            data  _nodes;
+28791     +                  set aout(firstobs=2 obs=&nodeobs);
+28792     +                  rename item1= node  count=weight;
+28793     +                  keep item1 count;
+28794     +            run;
+28797     +            data &links;
+28798     +                 set _ruleout;
+28799     +                 where (_LHAND ne ' ') and (_RHAND ne ' ') and (_LHAND ne _RHAND) and (set_size=2);
+28800     +                 rename  _LHAND=from ;
+28801     +                 rename  _RHAND=to;
+28802     +                 rename  count=weight;
+28803     +                 linkid = _N_;
+28804     +                 drop item1 item2 item3;   /*need to drop them or there will be confusion when renaming "from" to "item1, "to" to "item2" in RecdRules*/
+28805     +            run;
+28807     +       %end;      /*-- end of  %if (&seq. eq ) or ("&indata"="&EM_USER_TRANSACTION") %then %do; -------*/
+28808     +       %else %do;
+28809     +            /*-- If there is sequence var, note that relatioinal data does not process seq var --*/
+28811     +            /*get directed graph*/
+28813     +            proc assoc data=&EM_USER_SORTEDTRANS dmdbcat=cat out=aout items=1
+28814     +                  %if "&assocsuptype"="PERCENT" %then %do;
+28815     +                        pctsup=&assocsupport
+28816     +                   %end;
+28817     +                   %if "&assocsuptype"="COUNT" %then %do;
+28818     +                        support =&assocsupport
+28819     +                   %end;
+28820     +                ;                                                                                                                                                               ;
+28821     +                 cust &idv ;
+28822     +                 target &target;
+28823     +            run;
+28825     +            proc sequence data=&EM_USER_SORTEDTRANS dmdbcat=cat assoc=aout out=_ruleout nitems=2
+28826     +                   %if "&seqsuptype"="PERCENT" %then %do;
+28827     +                        pctsup=&seqsupport
+28828     +                    %end;
+28829     +                    %if "&seqsuptype"="COUNT" %then %do;
+28830     +                        support =&seqsupport
+28831     +                    %end;
+28832     +                 ;
+28833     +                 cust &idv ;
+28834     +                 target &target;
+28835     +                 visit  &seq /
+28836     +                 %if &same ne . %then %do;
+28837     +                              same=&same
+28838     +                 %end;
+28839     +                 %if &window ne . %then %do;
+28840     +                              window=&window
+28841     +                 %end;
+28842     +                  ;
+28843     +            run;
+28845     +             /*------ Exception string  :  check nobs at _ruleout , if no obs, need to reset support level    ----*/
+28846     +            %if %em_linkan_nobs(_ruleout)=0 %then %do;
+28847     +                  %let EMEXCEPTIONSTRING = exception.server.lnka.resetsupportlevelerr;
+28848     +                  %put &em_codebar;
+28849     +                  %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.resetsupportlevel_err, noquote));
+28850     +                  %put &errormsg;
+28851     +                  %put &em_codebar;
+28852     +                  %let errorflag=&errorflag+1;
+28853     +                  %return;
+28854     +            %end;
+28856     +            data _nodes;
+28857     +                 set aout;
+28858     +                 if _N_ = 1 then delete;
+28859     +                 keep item1 count ;
+28860     +                 rename item1=node count=weight;
+28861     +            run;
+28863     +            data &links;
+28864     +                 set _ruleout;
+28865     +                 where (iset1 ne ' ') and (iset2 ne ' ') and (iset1 ne iset2) and (nitems=2) and (conf>=&EM_PROPERTY_MINCONF);
+28866     +                 rename iset1= from;
+28867     +                 rename iset2=to;
+28868     +                 rename  count=weight;
+28869     +                 linkid=_N_;
+28870     +            run;
+28872     +               /*------ Exception string  :  check nobs at &linkd, if no obs, need to reset confidence level    ----*/
+28873     +            %if %em_linkan_nobs(&links)=0 %then %do;
+28874     +                  %let EMEXCEPTIONSTRING = exception.server.lnka.resetconflevelerr;
+28875     +                  %put &em_codebar;
+28876     +                  %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.resetconflevel_err, noquote));
+28877     +                  %put &errormsg;
+28878     +                  %put &em_codebar;
+28879     +                  %let errorflag=&errorflag+1;
+28880     +                  %return;
+28881     +            %end;
+28883     +       %end;
+28884     +       /*Get distinct nodes from links and look up weight from _nodes*/
+28885     +       %em_linkan_getnodesfromlinks(nodes=&nodes, links=&links, lookupnodes=_nodes);
+28887     +       proc delete data =aout;run;
+28888     +       proc delete data=_ruleout;run;
+28891     +    /*-------- create Recommend Rules ---------------------*/
+28893     +    data &EM_USER_RECDRULES;
+28894     +        set &links;
+28895     +        rename from=item1;
+28896     +        rename to = item2;
+28897     +        rename conf=confidence;
+28898     +        rename weight= count;
+28899     +        rename linkid=RuleID;
+28900     +        label   to= "%sysfunc(sasmsg(sashelp.dmine, lnka_recommendeditems_vlabel , noquote))";
+28901     +    run;
+28903     +%mend em_linkan_TransToGraph_AssocSeq;
+28905     +%macro em_linkan_recommend(intrans=, ar=, outtrans=);
+28906     +/*intrans: transaction data;
+28907     +  ar=association rule, i.e.,&EM_USER_RECDRULES;
+28908     +  outtrans=output recommendation table;*/
+28910     +  *get the recommended items;
+28911     +  *assuming the length of inferences is limit to one association rule;
+28912     +  %let id=%EM_ID;
+28913     +  %let target=%EM_TARGET;
+28914     +  proc sql;
+28915     +      create table tmp1 as
+28916     +      select a.&id, b.item2 as &target, sum(b.count*b.confidence)/sum(b.count) as confidence
+28917     +      from &intrans a, &ar b
+28918     +      where a.&target = b.item1
+28919     +      group by a.&id, b.item2
+28920     +      order by a.&id, confidence desc
+28921     +      ;
+28922     +  quit;
+28924     +  proc sql noprint;
+28925     +      create table tmp2 as
+28926     +      select tmp1.&id, tmp1.&target
+28927     +      from tmp1
+28928     +      except
+28929     +      select c.&id, c.&target
+28930     +      from &intrans c
+28931     +      ;
+28932     +      create table _outtrans as
+28933     +      select a.*, b.confidence
+28934     +      from tmp2 a, tmp1 b
+28935     +      where a.&id=b.&id and a.&target=b.&target
+28936     +      order by a.&id, confidence desc
+28937     +      ;
+28938     +  quit;
+28940     +  data &outtrans;
+28941     +      set _outtrans;
+28942     +      by &id; retain rank 0;
+28943     +      if first.&id then rank=1;
+28944     +      else rank+1;
+28945     +      label   confidence= "%sysfunc(sasmsg(sashelp.dmine, lnka_confidence_vlabel , noquote))";
+28946     +      label   rank= "%sysfunc(sasmsg(sashelp.dmine, lnka_rank_vlabel , noquote))";
+28947     +      label   &id="%sysfunc(sasmsg(sashelp.dmine, lnka_idv_vlabel , noquote))";
+28948     +  run;
+28950     +  proc datasets lib=work nolist;
+28951     +     delete tmp1 tmp2 _outtrans;
+28952     +  run;
+28953     +%mend em_linkan_recommend;
+28956     +%macro em_linkan_getoverlap2_rela(trans=,overlap=,overlap2=);    /*for relational data*/
+28958     +%let tarname=%EM_TARGET;
+28960     +proc sql;
+28961     +  create table trans2 as
+28962     +  select  distinct item, level, _category as varname
+28963     +  from &trans;
+28964     +quit;
+28966     +/*remove target's contribution for scoring:strip(trans2.varname) ne "&tarname"*/
+28967     +proc sql;
+28968     +  create table _overlap2 as
+28969     +  select b.node, trans2.varname, trans2.level,b.ItemCluster as ItemCluster, b.intensity
+28970     +  from trans2,&overlap as b
+28971     +  where trans2.item=b.node and strip(trans2.varname) ne "&tarname";
+28973     +  create table &overlap2 as
+28974     +  select d.*, c.FORMAT, c.TYPE,c.LENGTH
+28975     +   from
+28976     +     _overlap2 as d
+28977     +  left join
+28978     +     &EM_IMPORT_DATA_CMETA as c
+28979     +  on d.varname=c.NAME
+28980     +  order by d.node, d.ItemCluster;
+28981     +quit;
+28983     +data &overlap2;
+28984     +    set &overlap2;
+28985     +    if strip(format) eq '$' then format = ' ';
+28986     +    if missing(format) then do;
+28987     +       if type eq '' then format='best32.';
+28988     +        else if type eq 'N'
+28989     +            then format=cats('best',length,'.');
+28990     +            else format=cats('$',length,'.');
+28991     +    end;
+28992     +    else do;
+28993     +    if index(format,'.') le 0
+28994     +           then format=cats(format,'.');
+28995     +    end;
+28996     +    if upcase(format) eq  'BEST.'
+28997     +           then format='best32.';
+28998     +    drop length type;
+28999     +run;
+29001     +proc datasets lib=work nolist;
+29002     +  delete trans2 _overlap2;
+29003     +run;
+29005     +%mend em_linkan_getoverlap2_rela;
+29007     +%macro em_linkan_getoverlap2_trans(overlap=,overlap2=,target=);    /*for transactional data*/
+29010     +proc sql;
+29011     +  create table &overlap2(drop=_tmpnode_) as
+29012     +  select tranwrd( _tmpnode_,"'","''") as node, *, "&target" as varname
+29013     +  from &overlap(rename=(node=_tmpnode_));
+29014     +quit;
+29016     +%mend em_linkan_getoverlap2_trans;
+29020     +/*-----------------------------------------------------------------------------------
+29022     +     Call proc optgraph to get Centrality Measure and Community Info(Undirected Graph Only)
+29024     +------------------------------------------------------------------------------------*/
+29027     +%macro em_linkan_AnalyzeGraph(outnodes =,
+29028     +                              clustering_coef =,
+29029     +                              influence = ,
+29030     +                              close =,
+29031     +                              between =  ,
+29032     +                              eigen = ,
+29033     +                              eigen_algorithm = ,
+29034     +                              eigen_maxiter = ,
+29035     +                              hub = ,
+29036     +                              auth = ,
+29037     +                              seq=,
+29038     +                              max_comm_size=,
+29039     +                              max_diameter=,
+29040     +                              relation= ,
+29041     +                              commalgorithm = ,
+29042     +                              link_removal_ratio = ,
+29043     +                              max_iterations = ,
+29044     +                              modularity = ,
+29045     +                              resolution_list =
+29046     +                              );
+29048     +   %if &seq. eq %then %do;
+29049     +       %EM_GETNAME(KEY=COMMNODE, TYPE=DATA);
+29050     +       %EM_GETNAME(KEY=COMMLINK, TYPE=DATA);
+29051     +       %EM_GETNAME(KEY=COMMOVERLAP, TYPE=DATA);
+29052     +       %EM_GETNAME(KEY=COMMLEVEL, TYPE=DATA);
+29053     +   %end;
+29054     +   %EM_GETNAME(KEY=NODES, TYPE=DATA);
+29055     +   %EM_GETNAME(KEY=LINKS, TYPE=DATA);
+29057     +   data &EM_USER_LINKS;
+29058     +       set &EM_USER_LINKS;
+29059     +       weightInv=1.0/weight;
+29060     +   run;
+29062     +   proc optgraph
+29063     +       data_nodes = &EM_USER_NODES
+29064     +       data_links = &EM_USER_LINKS
+29065     +    %if &seq. eq %then %do;
+29066     +       graph_direction =undirected
+29067     +    %end;
+29068     +    %else %do;
+29069     +       graph_direction =directed
+29070     +    %end;
+29072     +    %if &transaction_data_indicator=0 %then %do;  /*relational data*/
+29073     +       out_nodes = _outnodes;
+29074     +    %end;
+29075     +    %else %do;
+29076     +       out_nodes =&outnodes ;
+29077     +    %end;
+29079     +       centrality
+29080     +       %if &seq. eq %then %do;
+29081     +                 degree = out
+29082     +               %if "&eigen"="Y" %then %do;
+29083     +                 eigen = both
+29084     +               eigen_algorithm =&eigen_algorithm
+29085     +               eigen_maxiter = &eigen_maxiter
+29086     +               %end;
+29087     +       %end;
+29088     +       %else %do;
+29089     +                 degree = both
+29090     +                %if "&hub"="Y" %then %do;
+29091     +                 hub=both
+29092     +                %end;
+29093     +                %if "&auth"="Y" %then %do;
+29094     +                 auth=both
+29095     +                %end;
+29096     +                %if "&hub"="Y" or "&auth"="Y" %then %do;
+29097     +                 eigen_algorithm =&eigen_algorithm
+29098     +                 eigen_maxiter = &eigen_maxiter
+29099     +                %end;
+29100     +       %end;
+29101     +        %if "&clustering_coef"="Y" %then %do;
+29102     +                 clustering_coef
+29103     +        %end;
+29104     +        %if "&influence"="Y" %then %do;
+29105     +               influence = both
+29106     +        %end;
+29107     +        %if "&close"="Y" %then %do;
+29108     +                close =   both
+29109     +        %end;
+29110     +        %if "&between"="Y" %then %do;
+29111     +                between = both
+29112     +        %end;
+29113     +        %if "&close"="Y" or "&between"="Y"  %then %do;
+29114     +               weight2=weightInv
+29115     +        %end;
+29116     +      ;
+29118     +       %if &seq. eq %then %do;  /*relational or transactional with no seq*/
+29119     +       community
+29120     +                algorithm =  &commalgorithm
+29121     +                link_removal_ratio =&link_removal_ratio
+29122     +                maxiter =  &max_iterations
+29123     +                modularity = &modularity
+29124     +                resolution_list =  &resolution_list
+29125     +              /*  recursive (max_comm_size=&max_comm_size. max_diameter=&max_diameter. relation=&relation.)    */
+29126     +                out_comm_links=&EM_USER_COMMLINK
+29127     +                out_community=&EM_USER_COMMNODE
+29128     +                out_level=&EM_USER_COMMLEVEL
+29129     +                out_overlap=&EM_USER_COMMOVERLAP
+29130     +       ;
+29131     +       %end;
+29132     +   run;
+29134     +   proc delete data=&EM_USER_NODES;run;
+29136     +   /*Change Community Data, map community 0-N to 1-N+1*/
+29137     +   %if &seq. eq %then %do;
+29139     +       data &EM_USER_COMMLINK;
+29140     +             format from_community_id $100. to_community_id $100.;
+29141     +             label  from_community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_from_community_id_vlabel, noquote))" ;
+29142     +             label  to_community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_to_community_id_vlabel, noquote))" ;
+29143     +             label link_weight ="%sysfunc(sasmsg(sashelp.dmine, lnka_weight_vlabel, noquote))" ;
+29144     +             label linkid ="%sysfunc(sasmsg(sashelp.dmine, lnka_linkid_vlabel, noquote))" ;
+29145     +             set &EM_USER_COMMLINK;
+29146     +             from_community = from_community+1;
+29147     +             to_community   = to_community+1;
+29148     +             from_community_id = cats(from_community);
+29149     +             to_community_id   = cats(to_community);
+29150     +             linkid=_N_;
+29151     +             rename from_community_id =from_ItemClusterID to_community_id =to_ItemClusterID;
+29152     +             drop level resolution from_community to_community;
+29153     +       run;
+29155     +       data &EM_USER_COMMNODE;
+29156     +             format community_id $100.;
+29157     +             label  community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_community_id_vlabel, noquote))" ;
+29158     +             label  community="%sysfunc(sasmsg(sashelp.dmine,lnka_community_1_vlabel, noquote))" ;
+29159     +             label  nodes="%sysfunc(sasmsg(sashelp.dmine,lnka_nodes_vlabel, noquote))" ;
+29160     +             set &EM_USER_COMMNODE;
+29161     +             community = community+1;
+29162     +             community_id   = cats(community);
+29163     +             rename community=ItemCluster community_id=ItemClusterID;
+29164     +             drop level resolution;
+29165     +       run;
+29167     +       data &EM_USER_COMMOVERLAP;
+29168     +             format community_id $100.;
+29169     +             label  community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_community_id_vlabel, noquote))" ;
+29170     +             label  community="%sysfunc(sasmsg(sashelp.dmine,lnka_community_1_vlabel, noquote))" ;
+29171     +             label node ="%sysfunc(sasmsg(sashelp.dmine, lnka_node_vlabel, noquote))" ;
+29172     +             label intensity ="%sysfunc(sasmsg(sashelp.dmine, lnka_intensity_vlabel, noquote))" ;
+29173     +             label community ="%sysfunc(sasmsg(sashelp.dmine, lnka_community_1_vlabel, noquote))" ;
+29174     +             label linkid ="%sysfunc(sasmsg(sashelp.dmine, lnka_linkid_vlabel, noquote))" ;
+29175     +             set &EM_USER_COMMOVERLAP;
+29176     +             community = community+1;
+29177     +             community_id   = cats(community);
+29178     +             linkid=_N_;
+29179     +             rename community_id=ItemClusterID community=ItemCluster;
+29180     +       run;
+29183     +   %end;
+29185     +   /*---- add group info: which var item is from, Only relational data has LOOKUP table**/
+29187     +   %if &transaction_data_indicator=0 %then %do;
+29188     +      proc sql;
+29189     +           create table  &OUTNODES as
+29190     +                  select  *
+29191     +                  from _outnodes as A, &EM_USER_LOOKUP as B
+29192     +                  where  A.node=B.Item;
+29193     +           alter table  &OUTNODES  drop item;
+29194     +      quit;
+29195     +      proc delete data=_outnodes;run;
+29196     +      proc delete data=&EM_USER_LOOKUP;
+29198     +   %end;
+29199     +   %else %do;/*For transactional data, add group info*/
+29200     +       %let target=%EM_TARGET;
+29201     +        data &EM_USER_OUTNODES;
+29202     +        format _group $32.;
+29203     +             set &EM_USER_OUTNODES;
+29204     +        _group="&target";
+29205     +        *_group_ind=1;/*don't need it for color*/
+29206     +        run;
+29208     +   %end;
+29210     +   %if &seq. eq %then %do;
+29211     +      data &OUTNODES;
+29212     +           format community_id $100.;
+29213     +           label  community_id="%sysfunc(sasmsg(sashelp.dmine,lnka_community_id_vlabel, noquote))" ;
+29214     +           set &OUTNODES;
+29215     +           community_1=community_1+1;
+29216     +           community_id=cats(community_1);
+29217     +           rename community_id=ItemClusterID;
+29218     +    run;
+29219     +   %end;
+29220     +   data &OUTNODES;;
+29221     +     set &OUTNODES;
+29222     +     %if &transaction_data_indicator=0 %then %do;
+29223     +     drop level;
+29224     +     %end;
+29225     +           label  node="%sysfunc(sasmsg(sashelp.dmine, lnka_node_vlabel, noquote))" ;
+29226     +           label  weight="%sysfunc(sasmsg(sashelp.dmine, lnka_weight_vlabel, noquote))";
+29227     +           label  _group= "%sysfunc(sasmsg(sashelp.dmine, lnka_group_vlabel, noquote))";
+29228     +           label  _category= "%sysfunc(sasmsg(sashelp.dmine, lnka_category_vlabel, noquote))";
+29229     +           label  community_1= "%sysfunc(sasmsg(sashelp.dmine, lnka_community_1_vlabel, noquote))";
+29230     +           label  centr_degree_in= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_degree_in_vlabel, noquote))";
+29231     +           label  centr_degree_out= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_degree_out_vlabel, noquote))";
+29232     +           label  centr_degree = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_degree_vlabel, noquote))";
+29233     +           label  centr_close_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_wt_vlabel, noquote))";
+29234     +           label  centr_close_in_wt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_in_wt_vlabel, noquote))";
+29235     +           label  centr_close_out_wt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_out_wt_vlabel, noquote))";
+29236     +           label  centr_close_unwt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_unwt_vlabel, noquote))";
+29237     +           label  centr_close_in_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_in_unwt_vlabel, noquote))";
+29238     +           label  centr_close_out_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_close_out_unwt_vlabel, noquote))";
+29239     +           label  centr_between_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_between_wt_vlabel, noquote))";
+29240     +           label  centr_between_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_between_unwt_vlabel, noquote))";
+29241     +           label  centr_influence1_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_influence1_wt_vlabel, noquote))";
+29242     +           label  centr_influence1_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_influence1_unwt_vlabel, noquote))";
+29243     +           label  centr_influence2_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_influence2_wt_vlabel, noquote))";
+29244     +           label  centr_influence2_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_influence2_unwt_vlabel, noquote))";
+29245     +           label  centr_cluster= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_cluster_vlabel, noquote))";
+29246     +           label  centr_eigen_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_eigen_wt_vlabel, noquote))";
+29247     +           label  centr_eigen_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_eigen_unwt_vlabel, noquote))";
+29248     +           label  centr_auth_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_auth_wt_vlabel, noquote))";
+29249     +           label  centr_auth_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_auth_unwt_vlabel, noquote))";
+29250     +           label  centr_hub_wt = "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_hub_wt_vlabel, noquote))";
+29251     +           label  centr_hub_unwt= "%sysfunc(sasmsg(sashelp.dmine, lnka_centr_hub_unwt_vlabel, noquote))";
+29252     +           rename community_1=ItemCluster;
+29253     +  run;
+29255     +   %em_getname(key=CENTMEASURE, type=data);
+29256     +   %em_getname(key=WTDCENTMEASURE, type=data);
+29257     +   /*Seperate &outnodes to two tables: Unweighted Centrality Measure Table and Weighted Centrality Measure Table for bar chart output*/
+29258     +   proc sql;
+29259     +      create table &EM_USER_CENTMEASURE as
+29260     +            select node, centr_degree_out
+29261     +            %if &seq. ne  %then %do;
+29262     +                , centr_degree_in ,  centr_degree
+29263     +                %if "&hub"="Y" %then %do;
+29264     +                  , centr_hub_unwt
+29265     +                %end;
+29266     +                %if "&auth"="Y" %then %do;
+29267     +                  , centr_auth_unwt
+29268     +                %end;
+29269     +            %end;
+29270     +            %else %do;
+29271     +                %if "&eigen"="Y" %then %do;
+29272     +                , centr_eigen_unwt
+29273     +               %end;
+29274     +            %end;
+29275     +            %if "&clustering_coef"="Y" %then %do;
+29276     +                 , centr_cluster
+29277     +             %end;
+29278     +             %if "&close"="Y" %then %do;
+29279     +                   , centr_close_unwt
+29280     +             %end;
+29281     +             %if "&between"="Y" %then %do;
+29282     +                   , centr_between_unwt
+29283     +             %end;
+29284     +             %if "&influence"="Y" %then %do;
+29285     +                  , centr_influence1_unwt
+29286     +                  , centr_influence2_unwt
+29287     +             %end;
+29288     +            from &outnodes;
+29290     +      create table &EM_USER_WTDCENTMEASURE as
+29291     +            select node, centr_degree_out
+29292     +            %if &seq. ne  %then %do;
+29293     +                , centr_degree_in ,  centr_degree
+29294     +                %if "&hub"="Y" %then %do;
+29295     +                 , centr_hub_wt
+29296     +                %end;
+29297     +                %if "&auth"="Y" %then %do;
+29298     +                  , centr_auth_wt
+29299     +                %end;
+29300     +            %end;
+29301     +            %else %do;
+29302     +                %if "&eigen"="Y" %then %do;
+29303     +                , centr_eigen_wt
+29304     +               %end;
+29305     +            %end;
+29306     +            %if "&clustering_coef"="Y" %then %do;
+29307     +                 , centr_cluster
+29308     +             %end;
+29309     +             %if "&close"="Y" %then %do;
+29310     +                  , centr_close_wt
+29311     +             %end;
+29312     +             %if "&between"="Y" %then %do;
+29313     +                  , centr_between_wt
+29314     +             %end;
+29315     +             %if "&influence"="Y" %then %do;
+29316     +                  , centr_influence1_wt
+29317     +                  , centr_influence2_wt
+29318     +             %end;
+29319     +            from &outnodes;
+29320     +   quit;
+29323     +data &EM_USER_LINKS;
+29324     +set &EM_USER_LINKS;
+29325     +drop weightInv;
+29326     +run;
+29328     +%mend em_linkan_AnalyzeGraph;
+NOTE: %INCLUDE (level 1) ending.
+MPRINT(EM_LINKANALYSIS_MAIN):   filename temp;
+NOTE: Fileref TEMP has been deassigned.
+MPRINT(EM_LINKANALYSIS_MAIN):   filename temp catalog 'sashelp.emexpl.link_train.source';
+NOTE: %INCLUDE (level 1) file TEMP is file SASHELP.EMEXPL.LINK_TRAIN.SOURCE.
+29331     +%macro EM_LINKANALYSIS_TRAIN;
+29332     +%global transaction_data_indicator;
+29333     +%global errorflag;
+29334     +%let transaction_data_indicator =0;
+29335     +%let errorflag=0;
+29337     +%let maxinput = 10000;
+29338     +%if %symexist(em_link_maxinput) %then %do;
+29339     +    %let maxinput = &em_link_maxinput;
+29340     +%end;
+29343     +/*----------------------------------------Exception Handling-------------------------------------------------------------*/
+29344     +/******************************************************************
+29345     +*********************Check Input Data******************************
+29346     +*******************************************************************/
+29347     +/*check if input data is transactional data*/
+29349     +%if "&EM_IMPORT_TRANSACTION" ne "" and (%sysfunc(exist(&EM_IMPORT_TRANSACTION)) or %sysfunc(exist(&EM_IMPORT_TRANSACTION, view))) %then %do;
+29350     +      %let transaction_data_indicator=1;
+29351     +%end;
+29352     +%else %do;  /*else check if input data is train or raw data*/
+29354     +      %let raw_or_train_data_indicator=0;
+29356     +      %if "&EM_IMPORT_DATA" ne "" and (%sysfunc(exist(&EM_IMPORT_DATA)) or
+29357     +      %sysfunc(exist(&EM_IMPORT_DATA, view))) %then  %do;
+29358     +            %let  raw_or_train_data_indicator=1;
+29359     +      %end;
+29360     +      /*pop out error msg if input data is of other kinds*/
+29361     +      %else %do;
+29362     +          %let EMEXCEPTIONSTRING = exception.server.lnka.datatypeerr;
+29363     +          %put &em_codebar;
+29364     +          %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.datatype_err, noquote));
+29365     +          %put &errormsg;
+29366     +          %put &em_codebar;
+29367     +          %return;
+29368     +      %end;
+29370     +%end;
+29372     +/********************************************************************
+29373     +*********************Check Input Variables**************************
+29374     +*********************************************************************/
+29376     +/****************************************************************************************************/
+29377     +/* 1.Transactional Data Input Vars: One ID, One Target, One Sequence(optional) , One Freq(optional);*/
+29378     +/****************************************************************************************************/
+29380     +%if  &transaction_data_indicator=1 %then %do;
+29381     +     /*-------------------------------------------------------------------------*/
+29382     +      * process only when there is one ID Var, otherwise exception message;
+29383     +     /*-------------------------------------------------------------------------*/
+29384     +      %if &EM_NUM_ID ne 1 %then %do;
+29386     +          %let EMEXCEPTIONSTRING = exception.server.lnka.idvarnumerr;
+29387     +          %put &em_codebar;
+29388     +          %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.idvarnum_err, noquote));
+29389     +          %put &errormsg;
+29390     +          %put &em_codebar;
+29391     +          %return;
+29393     +      %end;
+29394     +      %else %do;
+29396     +          *** proceed when there is one ID: check levels,should be nominal or interval  ;
+29397     +          data _null_;
+29398     +                 set &EM_DATA_VARIABLESET(where=(upcase(role)='ID'));
+29399     +                 call symput('IDLevel',   strip(upcase(level)));
+29400     +          run;
+29402     +          %if (&IDLevel ne INTERVAL) and (&IDLevel ne NOMINAL) %then %do;
+29403     +                %let EMEXCEPTIONSTRING = exception.server.lnka.idlevelerr;
+29404     +                %put &em_codebar;
+29405     +                %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.idlevel_err, noquote));
+29406     +                %put &errormsg;
+29407     +                %put &em_codebar;
+29408     +                %return;
+29409     +          %end;
+29411     +      %end;
+29413     +     /*-------------------------------------------------------------------------*/
+29414     +      * process only when there is one Target Var, otherwise exception message;
+29415     +     /*-------------------------------------------------------------------------*/
+29416     +      %if &EM_NUM_TARGET ne 1 %then %do;
+29418     +          %let EMEXCEPTIONSTRING = exception.server.lnka.targetvarnumerr;
+29419     +          %put &em_codebar;
+29420     +          %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.targetvarnum_err, noquote));
+29421     +          %put &errormsg;
+29422     +          %put &em_codebar;
+29423     +          %return;
+29425     +      %end;
+29426     +      %else %do;
+29428     +          *** proceed when there is one TARGET: check levels, should be interval or nominal;
+29429     +         data _null_;
+29430     +                 set &EM_DATA_VARIABLESET(where=(upcase(role)='TARGET'));
+29431     +                 call symput('TargetLevel',   strip(upcase(level)));
+29432     +             run;
+29434     +             %if (&TargetLevel ne INTERVAL) and (&TargetLevel ne NOMINAL) %then %do;
+29435     +                   %let EMEXCEPTIONSTRING = exception.server.lnka.targetlevelerr;
+29436     +                %put &em_codebar;
+29437     +                %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.taregtlevel_err, noquote));
+29438     +                %put &errormsg;
+29439     +                %put &em_codebar;
+29440     +                %return;
+29441     +             %end;
+29443     +      %end;
+29445     +     /*----------------------------------------------------------------------------------*/
+29446     +      * process only when there is no more than one Sequence Var, otherwise exception message;
+29447     +     /*-----------------------------------------------------------------------------------*/
+29449     +      %if &EM_NUM_SEQUENCE gt 1 %then %do;
+29451     +          %let EMEXCEPTIONSTRING = exception.server.lnka.seqvarnumerr;
+29452     +          %put &em_codebar;
+29453     +          %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.seqvarnum_err, noquote));
+29454     +          %put &errormsg;
+29455     +          %put &em_codebar;
+29456     +          %return;
+29458     +      %end;
+29459     +      %else %do;
+29461     +          *** proceed when there is one Sequence Var: check levels, should be interval;
+29462     +          %if &EM_NUM_SEQUENCE = 1 %then %do;
+29463     +                data _null_;
+29464     +                       set &EM_DATA_VARIABLESET(where=(upcase(role)='SEQUENCE'));
+29465     +                       call symput('SeqLevel',   strip(upcase(level)));
+29466     +                run;
+29467     +                %if  &SeqLevel ne INTERVAL  %then %do;
+29468     +                      %let EMEXCEPTIONSTRING = exception.server.lnka.seqlevelerr;
+29469     +                      %put &em_codebar;
+29470     +                      %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.seqlevel_err, noquote));
+29471     +                      %put &errormsg;
+29472     +                      %put &em_codebar;
+29473     +                      %return;
+29474     +                %end;
+29475     +          %end;
+29476     +      %end;
+29478     +     /*----------------------------------------------------------------------------*/
+29479     +      * process only when there is no more than one Freq Var, otherwise exception message;
+29480     +     /*-----------------------------------------------------------------------------*/
+29482     +      %if &EM_NUM_FREQ gt 1 %then %do;
+29484     +          %let EMEXCEPTIONSTRING = exception.server.lnka.freqvarnumerr;
+29485     +          %put &em_codebar;
+29486     +          %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.freqvarnum_err, noquote));
+29487     +          %put &errormsg;
+29488     +          %put &em_codebar;
+29489     +          %return;
+29491     +      %end;
+29492     +      %else %do;
+29493     +          *** proceed when there is one Freq Var: check levels, should be interval;
+29494     +            %if &EM_NUM_FREQ = 1 %then %do;
+29496     +               data _null_;
+29497     +                       set &EM_DATA_VARIABLESET(where=(upcase(role)='FREQ'));
+29498     +                       call symput('FreqLevel',   strip(upcase(level)));
+29499     +                   run;
+29501     +                   %if  &FreqLevel ne INTERVAL  %then %do;
+29502     +                        %let EMEXCEPTIONSTRING = exception.server.lnka.freqlevelerr;
+29503     +                      %put &em_codebar;
+29504     +                      %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.freqlevel_err, noquote));
+29505     +                      %put &errormsg;
+29506     +                      %put &em_codebar;
+29507     +                      %return;
+29508     +                   %end;
+29510     +            %end;
+29511     +      %end;
+29513     +%end;   /* end of %if  &transaction_data_indicator=1 %then %do;  */
+29514     +%else %do;
+29515     +/************************************************************************************************/
+29516     +/* 2. Relational Data Input Vars: At least Two  Vars; */
+29517     +/************************************************************************************************/
+29519     +  %let _nvars = %eval(&EM_NUM_INTERVAL_INPUT+&EM_NUM_BINARY_INPUT + &EM_NUM_NOMINAL_INPUT  +  &EM_NUM_ORDINAL_INPUT + &EM_NUM_INTERVAL_REJECTED + &EM_NUM_BINARY_REJECTED + &EM_NUM_NOMINAL_REJECTED + &EM_NUM_ORDINAL_REJECTED + &EM_NUM_TARGET);
+29520     +  %if &_nvars < 2 %then %do;
+29521     +          %let EMEXCEPTIONSTRING = exception.server.lnka.inputvarnumerr;
+29522     +          %put &em_codebar;
+29523     +          %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.inputvarnum_err, noquote));
+29524     +          %put &errormsg;
+29525     +          %put &em_codebar;
+29526     +          %return;
+29527     +  %end;
+29528     +  %else %if &_nvars > &maxinput %then %do;
+29529     +          %let EMEXCEPTIONSTRING = exception.server.lnka.numvarerr;
+29530     +          %put &em_codebar;
+29531     +          %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.numvar_err, noquote));
+29532     +          %put &errormsg;
+29533     +          %put &em_codebar;
+29534     +          %return;
+29535     +   %end;
+29536     +%end;
+29538     +/*----------------------------------------End Exception Handling-------------------------------------------------------------*/
+29540     +/*********************************************************************
+29541     +********************************Training******************************
+29542     +*********************************************************************/
+29543     +%em_getname(key=NODES, type=data);
+29544     +%em_getname(key=LINKS, type=data);
+29545     +%em_getname(key=OUTNODES, type=data);
+29546     +%em_getname(key=RULES, type=data);
+29549     +%let assocsup=;
+29550     +%let seqsup=;
+29551     +%if "&EM_PROPERTY_ASSOCSUPPORTTYPE"="PERCENT" %then %do;
+29552     +      %let assocsup=&EM_PROPERTY_ASSOCPCTSUPPORT;
+29553     +%end;
+29554     +%if "&EM_PROPERTY_ASSOCSUPPORTTYPE"="COUNT" %then %do;
+29555     +      %let assocsup=&EM_PROPERTY_ASSOCSUPPORT;
+29556     +%end;
+29558     +%if "&EM_PROPERTY_SEQSUPPORTTYPE"="PERCENT" %then %do;
+29559     +      %let seqsup=&EM_PROPERTY_SEQPCTSUPPORT;
+29560     +%end;
+29561     +%if "&EM_PROPERTY_SEQSUPPORTTYPE"="COUNT" %then %do;
+29562     +    %let seqsup=&EM_PROPERTY_SEQSUPPORT;
+29563     +%end;
+29566     +/*-----  If input data is transactional data -----------*/
+29568     +%if  &transaction_data_indicator eq 1  %then %do;
+29570     +            %let id_vars =%EM_ID;
+29571     +            %let target_vars=  %EM_TARGET;
+29572     +            %let freq_vars= %EM_FREQ;
+29573     +            %let seq_vars= %EM_SEQUENCE;
+29576     +            /*Two optional parameters, SAME and WINDOW, are available to define what is 'after'. The rule A==>B
+29577     +              implies SAME < TimeB - TimeA <= WINDOW.*/
+29579     +            %if "&seq_vars" ne "" and "&EM_PROPERTY_SAME" ne "." and "&EM_PROPERTY_WINDOW" ne "." %then %do;
+29580     +                %if %sysevalf(&EM_PROPERTY_SAME - &EM_PROPERTY_WINDOW ) ge 0 %then %do;
+29581     +                  %let EMEXCEPTIONSTRING = exception.server.lnka.invalidsamewindowerr;
+29582     +                  %put &em_codebar;
+29583     +                  %let errormsg = %sysfunc(sasmsg(sashelp.dmine, lnka.invalidsamewindow_err, noquote));
+29584     +                  %put &errormsg;
+29585     +                  %put &em_codebar;
+29586     +                  %return;
+29587     +                %end;
+29588     +            %end;
+29590     +            /*Explore Transactional Data Only-not for relational data*/
+29591     +            %em_getname(key=TransLinks, type=data);
+29592     +            %em_getname(key=TransNodes, type=data);
+29594     +            %em_linkan_TransAsNodesLinks(indata=&EM_IMPORT_TRANSACTION,
+29595     +                                         idv=&id_vars,
+29596     +                                         target=&target_vars,
+29597     +                                         freq=&freq_vars,
+29598     +                                         outnodes=&EM_USER_TransNodes,
+29599     +                                         outlinks=&EM_USER_TransLinks
+29600     +                                         );
+29601     +            %if &errorflag %then %return;
+29603     +            %em_linkan_TransToGraph_AssocSeq(indata=&EM_IMPORT_TRANSACTION,
+29604     +                                             nodes=&EM_USER_NODES,
+29605     +                                             links=&EM_USER_LINKS,
+29606     +                                             same=&EM_PROPERTY_SAME,
+29607     +                                             window=&EM_PROPERTY_WINDOW,
+29608     +                                             idv=&id_vars,
+29609     +                                             target=&target_vars,
+29610     +                                             seq=&seq_vars,
+29611     +                                             seqsuptype= &EM_PROPERTY_SEQSUPPORTTYPE,
+29612     +                                             seqsupport=&seqsup,
+29613     +                                             assocsuptype=  &EM_PROPERTY_ASSOCSUPPORTTYPE,
+29614     +                                             assocsupport=&assocsup
+29615     +                                             );
+29616     +            %if &errorflag %then %return;
+29617     +%end;
+29618     +%else %do;
+29620     +/*--------------- If input data is train or raw data, transform to transactional data -------------------*/
+29621     +/*--------------- relational data-> binning-> Assoc ->Graph -> Centrality -------------------------------*/
+29623     +            %em_getname(key=TRANS, type=data);
+29624     +            %em_getname(key=BINMAPPINGS, type=data);
+29625     +            %em_getname(key=BINOUT, type=data);
+29626     +            %em_getname(key=LOOKUP, type=data);
+29628     +            /*----- binning and transform to trasactional data --------------*/
+29629     +            %em_linkan_transpose(data= &EM_IMPORT_DATA,
+29630     +                                 trans=&EM_USER_TRANS,
+29631     +                                 binout=&EM_USER_BINOUT,
+29632     +                                 binnum= &EM_PROPERTY_NUMBIN,
+29633     +                                 lookup=&EM_USER_LOOKUP
+29634     +                                 );
+29635     +            %if &errorflag %then %return;
+29637     +            %let id_vars =newid;
+29638     +            %let target_vars= Item  ;
+29639     +            %let seq_vars= ;
+29641     +            /*----------------   Assoc --------------------------------------*/
+29643     +           %em_linkan_TransToGraph_AssocSeq(indata=&EM_USER_TRANS,
+29644     +                                             nodes=&EM_USER_NODES,
+29645     +                                             links=&EM_USER_LINKS,
+29646     +                                             same=&EM_PROPERTY_SAME,
+29647     +                                             window=&EM_PROPERTY_WINDOW,
+29648     +                                             idv=&id_vars,
+29649     +                                             target=&target_vars,
+29650     +                                             seq=&seq_vars,
+29651     +                                             seqsuptype= &EM_PROPERTY_SEQSUPPORTTYPE,
+29652     +                                             seqsupport=&seqsup,
+29653     +                                             assocsuptype=  &EM_PROPERTY_ASSOCSUPPORTTYPE,
+29654     +                                             assocsupport=&assocsup
+29655     +                                             );
+29656     +            %if &errorflag %then %return;
+29658     +%end;
+29660     +/*----------------   Calculate Centrality  and community -----------------------*/
+29662     +%em_linkan_AnalyzeGraph(outnodes=&EM_USER_OUTNODES,
+29663     +                        clustering_coef=&EM_PROPERTY_CLUSTERINGCOEF,
+29664     +                        influence = &EM_PROPERTY_INFLUENCE,
+29665     +                        close =  &EM_PROPERTY_CLOSE,
+29666     +                        between =  &EM_PROPERTY_BETWEEN ,
+29667     +                        eigen =  &EM_PROPERTY_EIGEN ,
+29668     +                        eigen_algorithm = &EM_PROPERTY_EIGEN_ALGORITHM,
+29669     +                                     eigen_maxiter = &EM_PROPERTY_EIGEN_MAXITER ,
+29670     +                                     hub = &EM_PROPERTY_HUB ,
+29671     +                                     auth = &EM_PROPERTY_AUTH,
+29672     +                                     seq=&seq_vars ,
+29673     +                                     max_comm_size=&EM_PROPERTY_MAX_COMM_SIZE,
+29674     +                                     max_diameter=&EM_PROPERTY_MAX_DIAMETER,
+29675     +                                     relation=&EM_PROPERTY_RELATION,
+29676     +                                     commalgorithm =&EM_PROPERTY_COMMALGORITHM,
+29677     +                                     link_removal_ratio =  &EM_PROPERTY_LINK_REMOVAL_RATIO,
+29678     +                                     max_iterations = &EM_PROPERTY_MAX_ITERATIONS,
+29679     +                                     modularity = &EM_PROPERTY_MODULARITY,
+29680     +                                     resolution_list = &EM_PROPERTY_RESOLUTION_LIST
+29681     +                                     );
+29682     +%if &errorflag %then %return;
+29685     +%mend EM_LINKANALYSIS_TRAIN;
+NOTE: %INCLUDE (level 1) ending.
+MPRINT(EM_LINKANALYSIS_MAIN):   filename temp;
+NOTE: Fileref TEMP has been deassigned.
+MPRINT(EM_LINKANALYSIS_TRAIN):   * process only when there is one ID Var, otherwise exception message;
+MPRINT(EM_LINKANALYSIS_TRAIN):   *** proceed when there is one ID: check levels,should be nominal or interval ;
+MPRINT(EM_LINKANALYSIS_TRAIN):   data _null_;
+MPRINT(EM_LINKANALYSIS_TRAIN):   set EMWS3.Link_VariableSet(where=(upcase(role)='ID'));
+MPRINT(EM_LINKANALYSIS_TRAIN):   call symput('IDLevel', strip(upcase(level)));
+MPRINT(EM_LINKANALYSIS_TRAIN):   run;
+
+NOTE: There were 1 observations read from the data set EMWS3.LINK_VARIABLESET.
+      WHERE UPCASE(role)='ID';
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_TRAIN):   * process only when there is one Target Var, otherwise exception message;
+MPRINT(EM_LINKANALYSIS_TRAIN):   *** proceed when there is one TARGET: check levels, should be interval or nominal;
+MPRINT(EM_LINKANALYSIS_TRAIN):   data _null_;
+MPRINT(EM_LINKANALYSIS_TRAIN):   set EMWS3.Link_VariableSet(where=(upcase(role)='TARGET'));
+MPRINT(EM_LINKANALYSIS_TRAIN):   call symput('TargetLevel', strip(upcase(level)));
+MPRINT(EM_LINKANALYSIS_TRAIN):   run;
+
+NOTE: There were 1 observations read from the data set EMWS3.LINK_VARIABLESET.
+      WHERE UPCASE(role)='TARGET';
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_TRAIN):   * process only when there is no more than one Sequence Var, otherwise exception message;
+MPRINT(EM_LINKANALYSIS_TRAIN):   *** proceed when there is one Sequence Var: check levels, should be interval;
+MPRINT(EM_LINKANALYSIS_TRAIN):   data _null_;
+MPRINT(EM_LINKANALYSIS_TRAIN):   set EMWS3.Link_VariableSet(where=(upcase(role)='SEQUENCE'));
+MPRINT(EM_LINKANALYSIS_TRAIN):   call symput('SeqLevel', strip(upcase(level)));
+MPRINT(EM_LINKANALYSIS_TRAIN):   run;
+
+NOTE: There were 1 observations read from the data set EMWS3.LINK_VARIABLESET.
+      WHERE UPCASE(role)='SEQUENCE';
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_TRAIN):   * process only when there is no more than one Freq Var, otherwise exception message;
+MPRINT(EM_LINKANALYSIS_TRAIN):   *** proceed when there is one Freq Var: check levels, should be interval;
+MPRINT(EM_LINKANALYSIS_TRAIN):  ;
+MPRINT(EM_LINKANALYSIS_TRAIN):  ;
+MPRINT(EM_LINKANALYSIS_TRAIN):  ;
+MPRINT(EM_LINKANALYSIS_TRAIN):  ;
+MPRINT(EM_LINKANALYSIS_TRAIN):  ;
+MPRINT(EM_LINKANALYSIS_TRAIN):  ;
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   data EMWS3.Link_TransLinks;
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   set EMWS3.Ids_DATA;
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   format from $100. to $100.;
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   from = cats(session_id);
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   to = cats(requested_file);
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   drop session_id requested_file;
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   weight=1;
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   linkid=_N_;
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   run;
+
+NOTE: View EMWS3.IDS_DATA.VIEW used (Total process time):
+      real time           0.07 seconds
+      cpu time            0.06 seconds
+      
+NOTE: There were 4979 observations read from the data set SAMPSIO.WEBPATH.
+NOTE: There were 4979 observations read from the data set EMWS3.IDS_DATA.
+NOTE: The data set EMWS3.LINK_TRANSLINKS has 4979 observations and 6 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.19 seconds
+      cpu time            0.09 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   proc sql noprint;
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   select count(*) into: translinkrows from EMWS3.Link_TransLinks;
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):   quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   proc sql;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   create table _node1 as select distinct from as node , "session_id" as _group from EMWS3.Link_TransLinks;
+NOTE: Table WORK._NODE1 created, with 290 rows and 2 columns.
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   create table _node2 as select distinct to as node , "requested_file" as _group from EMWS3.Link_TransLinks;
+NOTE: Table WORK._NODE2 created, with 76 rows and 2 columns.
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.17 seconds
+      cpu time            0.04 seconds
+      
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   data EMWS3.Link_TransNodes;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   retain node _group _group_ind;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   format _group $32.;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   set _node1 _node2;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   if _group="session_id" then _group_ind=1;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   if _group="requested_file" then _group_ind=2;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   run;
+
+NOTE: There were 290 observations read from the data set WORK._NODE1.
+NOTE: There were 76 observations read from the data set WORK._NODE2.
+NOTE: The data set EMWS3.LINK_TRANSNODES has 366 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.07 seconds
+      cpu time            0.04 seconds
+      
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   proc datasets lib=work nolist;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   delete _node1 _node2 ;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   run;
+
+NOTE: Deleting WORK._NODE1 (memtype=DATA).
+NOTE: Deleting WORK._NODE2 (memtype=DATA).
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   quit;
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSASNODESLINKS):  ;
+MPRINT(EM_LINKANALYSIS_TRAIN):  ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):  ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):  ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):  ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   proc sort data=EMWS3.Ids_DATA out=EMWS3.Link_SORTEDTRANS;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   by session_id;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   run;
+
+NOTE: There were 4979 observations read from the data set EMWS3.IDS_DATA.
+NOTE: View EMWS3.IDS_DATA.VIEW used (Total process time):
+      real time           0.08 seconds
+      cpu time            0.04 seconds
+      
+NOTE: There were 4979 observations read from the data set SAMPSIO.WEBPATH.
+NOTE: The data set EMWS3.LINK_SORTEDTRANS has 4979 observations and 4 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.25 seconds
+      cpu time            0.07 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   data EMWS3.Link_SORTEDTRANS;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   set EMWS3.Link_SORTEDTRANS;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   chartarget=cats(requested_file);
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   drop requested_file;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename chartarget=requested_file;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   run;
+
+NOTE: There were 4979 observations read from the data set EMWS3.LINK_SORTEDTRANS.
+NOTE: The data set EMWS3.LINK_SORTEDTRANS has 4979 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.29 seconds
+      cpu time            0.04 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   proc dmdb batch data=EMWS3.Link_SORTEDTRANS dmdbcat=cat;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   id session_id session_sequence;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   class requested_file(desc);
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   run;
+
+NOTE: Records processed = 4979   Memory used = 511K.
+NOTE: There were 4979 observations read from the data set EMWS3.LINK_SORTEDTRANS.
+NOTE: PROCEDURE DMDB used (Total process time):
+      real time           0.20 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   proc assoc data=EMWS3.Link_SORTEDTRANS dmdbcat=cat out=aout items=1 support =1 ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   cust session_id ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   target requested_file;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   run;
+
+
+----- Potential 1 item sets = 76 -----
+Counting items, records read:     4979
+Number of customers:               290
+Support level for item sets:         1
+Maximum count for a set:           197
+Sets meeting support level:         76
+Megs of memory used:              0.51
+NOTE: The data set WORK.AOUT has 77 observations and 3 variables.
+NOTE: PROCEDURE ASSOC used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   proc sequence data=EMWS3.Link_SORTEDTRANS dmdbcat=cat assoc=aout out=_ruleout nitems=2 pctsup=1 ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   cust session_id ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   target requested_file;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   visit session_sequence / ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   run;
+
+Large itemsets:              76
+Total records read:        4979
+Customer count:             290
+Support set to:               2
+Total sequences formed:      882
+Number >= support           485
+Memory allocated megs:        6
+NOTE: The data set WORK._RULEOUT has 485 observations and 8 variables.
+NOTE: PROCEDURE SEQUENCE used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   data _nodes;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   set aout;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   if _N_ = 1 then delete;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   keep item1 count ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename item1=node count=weight;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   run;
+
+NOTE: There were 77 observations read from the data set WORK.AOUT.
+NOTE: The data set WORK._NODES has 76 observations and 2 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   data EMWS3.Link_LINKS;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   set _ruleout;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   where (iset1 ne ' ') and (iset2 ne ' ') and (iset1 ne iset2) and (nitems=2) and (conf>=50);
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename iset1= from;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename iset2=to;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename count=weight;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   linkid=_N_;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   run;
+
+NOTE: There were 111 observations read from the data set WORK._RULEOUT.
+      WHERE (iset1 not = ' ') and (iset2 not = ' ') and (iset1 not = iset2) and (nitems=2) and (conf>=50);
+NOTE: The data set EMWS3.LINK_LINKS has 111 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.09 seconds
+      cpu time            0.04 seconds
+      
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   proc sql;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   create table _node1 as select distinct from as node from EMWS3.Link_LINKS;
+NOTE: Table WORK._NODE1 created, with 32 rows and 1 columns.
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   create table _node2 as select distinct to as node from EMWS3.Link_LINKS;
+NOTE: Table WORK._NODE2 created, with 20 rows and 1 columns.
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   proc sql;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   create table _nodes_tmp as select node from _node1 UNION select node from _node2;
+NOTE: Table WORK._NODES_TMP created, with 35 rows and 1 columns.
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   proc sql;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   create table EMWS3.Link_NODES as select b.* from _nodes_tmp as a LEFT JOIN _nodes as b on a.node = b.node;
+NOTE: Table EMWS3.LINK_NODES created, with 35 rows and 2 columns.
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.11 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   proc datasets lib=work nolist;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   delete _node1 _node2 _nodes_tmp ;
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   run;
+
+NOTE: Deleting WORK._NODE1 (memtype=DATA).
+NOTE: Deleting WORK._NODE2 (memtype=DATA).
+NOTE: Deleting WORK._NODES_TMP (memtype=DATA).
+MPRINT(EM_LINKAN_GETNODESFROMLINKS):   quit;
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):  ;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   proc delete data =aout;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):  run;
+
+NOTE: Deleting WORK.AOUT (memtype=DATA).
+NOTE: PROCEDURE DELETE used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   proc delete data=_ruleout;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):  run;
+
+NOTE: Deleting WORK._RULEOUT (memtype=DATA).
+NOTE: PROCEDURE DELETE used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   data EMWS3.Link_RecdRules;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   set EMWS3.Link_LINKS;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename from=item1;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename to = item2;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename conf=confidence;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename weight= count;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   rename linkid=RuleID;
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   label to= "Recommended Items";
+MPRINT(EM_LINKAN_TRANSTOGRAPH_ASSOCSEQ):   run;
+
+NOTE: There were 111 observations read from the data set EMWS3.LINK_LINKS.
+NOTE: The data set EMWS3.LINK_RECDRULES has 111 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.09 seconds
+      cpu time            0.03 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_TRAIN):  ;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):  ;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):  ;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   data EMWS3.Link_LINKS;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   set EMWS3.Link_LINKS;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   weightInv=1.0/weight;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   run;
+
+NOTE: There were 111 observations read from the data set EMWS3.LINK_LINKS.
+NOTE: The data set EMWS3.LINK_LINKS has 111 observations and 10 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.11 seconds
+      cpu time            0.04 seconds
+      
+
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   proc optgraph data_nodes = EMWS3.Link_NODES data_links = EMWS3.Link_LINKS graph_direction =directed out_nodes =EMWS3.Link_OUTNODES ;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   centrality degree = both clustering_coef influence = both close = both between = both weight2=weightInv ;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   run;
+
+NOTE: 
+      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+NOTE: Running OPTGRAPH version 14.1.
+NOTE: 
+      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+NOTE: The OPTGRAPH procedure is executing in single-machine mode.
+NOTE: 
+      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+NOTE: Data input used 0.00 (cpu: 0.00) seconds.
+NOTE: The number of nodes in the input graph is 35.
+NOTE: The number of links in the input graph is 111.
+NOTE: 
+      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+NOTE: Processing centrality metrics.
+NOTE: Processing centrality metrics used 0.02 (cpu: 0.00) seconds.
+NOTE: 
+      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+NOTE: Data output used 0.02 (cpu: 0.00) seconds.
+NOTE: 
+      ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+NOTE: The data set EMWS3.LINK_OUTNODES has 35 observations and 18 variables.
+NOTE: The PROCEDURE OPTGRAPH printed pages 5-7.
+NOTE: PROCEDURE OPTGRAPH used (Total process time):
+      real time           0.26 seconds
+      cpu time            0.10 seconds
+      
+
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   proc delete data=EMWS3.Link_NODES;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):  run;
+
+NOTE: Deleting EMWS3.LINK_NODES (memtype=DATA).
+NOTE: PROCEDURE DELETE used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   data EMWS3.Link_OUTNODES;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   format _group $32.;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   set EMWS3.Link_OUTNODES;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   _group="requested_file";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   *_group_ind=1;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   run;
+
+NOTE: There were 35 observations read from the data set EMWS3.LINK_OUTNODES.
+NOTE: The data set EMWS3.LINK_OUTNODES has 35 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.09 seconds
+      cpu time            0.03 seconds
+      
+
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   data EMWS3.Link_OUTNODES;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):  ;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   set EMWS3.Link_OUTNODES;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label node= "Node" ;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label weight= "Weight";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label _group= "Group";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label _category= "Original Variable";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label community_1= "Item-cluster";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_degree_in= "In-degree Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_degree_out= "Out-degree Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_degree = "Degree Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_close_wt = "Weighted Closeness Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_close_in_wt= "Weighted In-Closeness Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_close_out_wt= "Weighted Out-Closeness Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_close_unwt = "Unweighted Closeness Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_close_in_unwt= "Unweighted In-Closeness Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_close_out_unwt= "Unweighted Out-Closeness Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_between_wt = "Weighted Betweenness Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_between_unwt= "Unweighted Betweenness Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_influence1_wt = "Weighted Influence1 Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_influence1_unwt= "Unweighted Influence1 Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_influence2_wt = "Weighted Influence2 Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_influence2_unwt= "Unweighted Influence2 Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_cluster= "Clustering Coefficient Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_eigen_wt = "Weighted Eigenvector Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_eigen_unwt= "Unweighted Eigenvector Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_auth_wt = "Weighted Authority Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_auth_unwt= "Unweighted Authority Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_hub_wt = "Weighted Hub Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   label centr_hub_unwt= "Unweighted Hub Centrality";
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   rename community_1=ItemCluster;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   run;
+
+NOTE: Variable _category is uninitialized.
+NOTE: Variable community_1 is uninitialized.
+NOTE: Variable centr_eigen_wt is uninitialized.
+NOTE: Variable centr_eigen_unwt is uninitialized.
+NOTE: Variable centr_auth_wt is uninitialized.
+NOTE: Variable centr_auth_unwt is uninitialized.
+NOTE: Variable centr_hub_wt is uninitialized.
+NOTE: Variable centr_hub_unwt is uninitialized.
+WARNING: The variable community_1 in the DROP, KEEP, or RENAME list has never been referenced.
+NOTE: There were 35 observations read from the data set EMWS3.LINK_OUTNODES.
+NOTE: The data set EMWS3.LINK_OUTNODES has 35 observations and 19 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.18 seconds
+      cpu time            0.07 seconds
+      
+
+MPRINT(EM_LINKAN_ANALYZEGRAPH):  ;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):  ;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   proc sql;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   create table EMWS3.Link_CENTMEASURE as select node, centr_degree_out , centr_degree_in , centr_degree , centr_cluster , centr_close_unwt , centr_between_unwt , centr_influence1_unwt , centr_influence2_unwt from 
+EMWS3.Link_OUTNODES;
+NOTE: Table EMWS3.LINK_CENTMEASURE created, with 35 rows and 9 columns.
+
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   create table EMWS3.Link_WTDCENTMEASURE as select node, centr_degree_out , centr_degree_in , centr_degree , centr_cluster , centr_close_wt , centr_between_wt , centr_influence1_wt , centr_influence2_wt from 
+EMWS3.Link_OUTNODES;
+NOTE: Table EMWS3.LINK_WTDCENTMEASURE created, with 35 rows and 9 columns.
+
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.21 seconds
+      cpu time            0.06 seconds
+      
+
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   data EMWS3.Link_LINKS;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   set EMWS3.Link_LINKS;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   drop weightInv;
+MPRINT(EM_LINKAN_ANALYZEGRAPH):   run;
+
+NOTE: There were 111 observations read from the data set EMWS3.LINK_LINKS.
+NOTE: The data set EMWS3.LINK_LINKS has 111 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.09 seconds
+      cpu time            0.01 seconds
+      
+
+MPRINT(EM_LINKANALYSIS_TRAIN):  ;
+MPRINT(EM_LINKANALYSIS_MAIN):  ;
+MPRINT(EM_DIAGRAM):  ;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   * End TRAIN: Link;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+29686      *------------------------------------------------------------*;
+29687      * End TRAIN: Link;
+29688      *------------------------------------------------------------*;
+
+29689      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):    *------------------------------------------------------------*;
+29690      * Close any missing semi colons;
+MPRINT(EM_DIAGRAM):   * Close any missing semi colons;
+29691      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+29692      ;
+MPRINT(EM_DIAGRAM):   ;
+29693      ;
+MPRINT(EM_DIAGRAM):   ;
+29694      ;
+MPRINT(EM_DIAGRAM):   ;
+29695      ;
+MPRINT(EM_DIAGRAM):   ;
+29696      quit;
+MPRINT(EM_DIAGRAM):   quit;
+29697      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+29698      * Close any unbalanced quotes;
+MPRINT(EM_DIAGRAM):   * Close any unbalanced quotes;
+29699      *------------------------------------------------------------*;
+MPRINT(EM_DIAGRAM):   *------------------------------------------------------------*;
+29700      /*; *"; *'; */
+29701      ;
+MPRINT(EM_DIAGRAM):   ;
+29702      run;
+MPRINT(EM_DIAGRAM):   run;
+29703      quit;
+MPRINT(EM_DIAGRAM):   quit;
+29704      /* Reset EM Options */
+29705      options formchar="|----|+|---+=|-/\<>*";
+MPRINT(EM_DIAGRAM):   options formchar="|----|+|---+=|-/\<>*";
+29706      options nocenter ls=256 ps=10000;
+MPRINT(EM_DIAGRAM):   options nocenter ls=256 ps=10000;
+29707      goptions reset=all device=GIF NODISPLAY;
+MPRINT(EM_DIAGRAM):   goptions reset=all device=GIF NODISPLAY;
+MPRINT(EM_DIAGRAM):    proc printto;
+MPRINT(EM_DIAGRAM):   run;

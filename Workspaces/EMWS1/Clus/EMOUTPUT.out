@@ -1,0 +1,152 @@
+*------------------------------------------------------------*
+User:                jmmorr01
+Date:                November 13, 2018
+Time:                10:20:14
+*------------------------------------------------------------*
+* Training Output
+*------------------------------------------------------------*
+ 
+ 
+ 
+ 
+Variable Summary
+ 
+            Measurement    Frequency
+Role           Level         Count
+ 
+ID           NOMINAL            1
+INPUT        INTERVAL          17
+REJECTED     BINARY             2
+REJECTED     INTERVAL           1
+REJECTED     NOMINAL            2
+ 
+ 
+ 
+The CLUSTER Procedure
+Ward's Minimum Variance Cluster Analysis
+ 
+            Eigenvalues of the Covariance Matrix
+ 
+        Eigenvalue    Difference    Proportion    Cumulative
+ 
+   1    5711298.64    5641249.01        0.9785        0.9785
+   2      70049.63      46410.43        0.0120        0.9905
+   3      23639.20       9836.17        0.0040        0.9945
+   4      13803.03       4604.17        0.0024        0.9969
+   5       9198.86       3331.27        0.0016        0.9985
+   6       5867.59       3586.12        0.0010        0.9995
+   7       2281.48       1797.20        0.0004        0.9999
+   8        484.28        402.30        0.0001        1.0000
+   9         81.98         24.31        0.0000        1.0000
+  10         57.67         13.47        0.0000        1.0000
+  11         44.20         19.47        0.0000        1.0000
+  12         24.73         14.79        0.0000        1.0000
+  13          9.93          4.84        0.0000        1.0000
+  14          5.09          3.78        0.0000        1.0000
+  15          1.31          0.89        0.0000        1.0000
+  16          0.42          0.33        0.0000        1.0000
+  17          0.09                      0.0000        1.0000
+ 
+Root-Mean-Square Total-Sample Standard Deviation    585.9558
+ 
+Root-Mean-Square Distance Between Observations     3416.68
+ 
+ 
+                                                 Cluster History
+  Number
+      of                                                 Semipartial                 Pseudo F       Pseudo
+Clusters    ------Clusters Joined-------         Freq       R-Square    R-Square    Statistic    t-Squared    Tie
+ 
+      49    OB27            OB30                   13         0.0000        1.00         16E4         23E3
+      48    OB6             OB40                    7         0.0001        1.00         61E3          3E4
+      47    OB38            OB49                    7         0.0001        1.00         36E3         29E3
+      46    OB44            OB47                    3         0.0001        1.00         24E3         76E3
+      45    OB22            OB45                    6         0.0001        1.00         18E3         46E3
+      44    OB18            OB21                    5         0.0001        1.00         14E3         68E3
+      43    OB19            OB41                    6         0.0001        .999         11E3         96E3
+      42    OB12            CL49                   21         0.0002        .999         9227         85.2
+      41    OB33            OB50                    6         0.0002        .999         7789          1E5
+      40    OB4             CL44                    8         0.0002        .999         6745         10.2
+      39    OB9             OB46                    3         0.0002        .999         5974         99E3
+      38    OB17            OB31                    7         0.0002        .999         5315         13E4
+      37    OB20            OB37                    6         0.0002        .998         4808         12E4
+      36    OB1             OB7                    61         0.0002        .998         4399         18E4
+      35    OB13            OB23                   14         0.0002        .998         4076         13E4
+      34    OB34            OB43                    2         0.0002        .998         3783           .
+      33    OB28            OB48                   12         0.0002        .997         3542         15E4
+      32    OB11            OB36                   10         0.0003        .997         3300         16E4
+      31    OB29            OB32                   16         0.0003        .997         3076         15E4
+      30    CL39            OB16                    4         0.0003        .997         2894          3.7
+      29    CL43            OB39                    9         0.0004        .996         2726         18.0
+      28    CL36            OB5                    73         0.0004        .996         2572          132
+      27    CL40            CL38                   15         0.0004        .995         2441         11.5
+      26    OB3             CL35                   24         0.0005        .995         2313         48.2
+      25    CL42            OB14                   33         0.0005        .994         2194         84.9
+      24    OB10            CL45                   14         0.0005        .994         2095         71.2
+      23    CL29            OB42                   17         0.0006        .993         1996         18.7
+      22    CL31            CL47                   23         0.0007        .993         1908         36.2
+      21    CL26            CL48                   31         0.0007        .992         1839         27.0
+      20    CL27            CL34                   17         0.0007        .991         1781          9.8
+      19    CL20            CL37                   23         0.0009        .990         1703          9.6
+      18    CL24            CL32                   24         0.0010        .989         1641         24.0
+      17    CL21            OB26                   40         0.0011        .988         1583         29.8
+      16    OB15            CL22                   47         0.0013        .987         1527         54.9
+      15    CL28            CL25                  106         0.0014        .985         1478          114
+      14    CL33            CL41                   18         0.0017        .984         1431         66.2
+      13    CL23            OB24                   28         0.0017        .982         1408         39.1
+      12    CL18            CL46                   27         0.0018        .980         1401         22.1
+      11    CL30            OB25                    7         0.0021        .978         1392         21.3
+      10    OB2             OB35                   25         0.0026        .976         1383         19E5
+       9    CL10            CL16                   72         0.0044        .971         1315         62.9
+       8    CL9             CL14                   90         0.0063        .965         1229         48.5
+       7    CL12            CL13                   55         0.0081        .957         1160         65.4
+       6    CL19            CL11                   30         0.0091        .948         1143         45.4
+       5    CL8             CL17                  130         0.0198        .928         1019          125
+       4    CL6             OB8                    31         0.0263        .902          970         51.9
+       3    CL4             CL7                    86         0.0858        .816          706          129
+       2    CL15            CL5                   236         0.1033        .712          793          565
+       1    CL2             CL3                   322         0.7124        .000           .           793
+ 
+ 
+ 
+Candidates for Optimum Number of Clusters
+ 
+        Number     Clustering
+          of          Cubic
+Obs    Clusters     Criterion
+ 
+ 1         4        -2.76192
+
+
+*------------------------------------------------------------*
+* Score Output
+*------------------------------------------------------------*
+
+
+*------------------------------------------------------------*
+* Report Output
+*------------------------------------------------------------*
+ 
+ 
+ 
+ 
+Variable Importance
+ 
+                                              Number of    Number of
+Variable                                      Splitting    Surrogate
+Name            Label                           Rules        Rules      Importance
+ 
+no_hits         Hits in 1986                      2            0          1.00000
+no_runs         Runs in 1986                      0            3          0.97822
+no_atbat        Times at Bat in 1986              0            2          0.97088
+no_rbi          RBIs in 1986                      0            2          0.93706
+IMP_logsalar    Imputed: Log Salary               0            4          0.93077
+cr_rbi          Career RBIs                       1            4          0.84937
+cr_atbat        Career times at bat               1            3          0.84107
+cr_hits         Career Hits                       0            4          0.83285
+cr_runs         Career Runs                       0            4          0.82807
+no_bb           Walks in 1986                     0            2          0.80074
+yr_major        Years in the Major Leagues        0            3          0.77666
+cr_bb           Career Walks                      1            2          0.74508
+no_home         Home Runs in 1986                 1            1          0.48568
+cr_home         Career Home Runs                  1            1          0.40784

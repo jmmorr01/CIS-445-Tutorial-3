@@ -1,0 +1,91 @@
+*------------------------------------------------------------*
+User:                jmmorr01
+Date:                November 13, 2018
+Time:                10:27:21
+*------------------------------------------------------------*
+* Training Output
+*------------------------------------------------------------*
+ 
+ 
+ 
+ 
+Variable Summary
+ 
+          Measurement    Frequency
+Role         Level         Count
+ 
+ID         INTERVAL          1
+TARGET     NOMINAL           1
+ 
+ 
+ 
+ 
+Association Report
+ 
+              Expected
+             Confidence    Confidence    Support              Transaction                                                                                               Rule        Rule          Rule      Rule        Rule         Rule
+Relations       (%)           (%)          (%)        Lift       Count                         Rule                        Left Hand of Rule     Right Hand of Rule     Item 1      Item 2       Item 3     Item 4      Item 5      Index
+ 
+      4         12.59         71.43        8.99       5.67       90.00       sardines & apples ==> peppers & avocado      sardines & apples      peppers & avocado      sardines    apples      =======>    peppers     avocado        1
+      4         12.59         71.43        8.99       5.67       90.00       peppers & avocado ==> sardines & apples      peppers & avocado      sardines & apples      peppers     avocado     =======>    sardines    apples         2
+      4         14.69         82.86       11.59       5.64      116.00       ice_crea & chicken ==> sardines & coke       ice_crea & chicken     sardines & coke        ice_crea    chicken     =======>    sardines    coke           3
+      4         13.99         78.91       11.59       5.64      116.00       sardines & coke ==> ice_crea & chicken       sardines & coke        ice_crea & chicken     sardines    coke        =======>    ice_crea    chicken        4
+      4         11.89         66.21        9.59       5.57       96.00       ice_crea & bourbon ==> turkey & coke         ice_crea & bourbon     turkey & coke          ice_crea    bourbon     =======>    turkey      coke           5
+      4         14.49         80.67        9.59       5.57       96.00       turkey & coke ==> ice_crea & bourbon         turkey & coke          ice_crea & bourbon     turkey      coke        =======>    ice_crea    bourbon        6
+      4         13.89         76.82       11.59       5.53      116.00       sardines & ice_crea ==> coke & chicken       sardines & ice_crea    coke & chicken         sardines    ice_crea    =======>    coke        chicken        7
+      4         15.08         83.45       11.59       5.53      116.00       coke & chicken ==> sardines & ice_crea       coke & chicken         sardines & ice_crea    coke        chicken     =======>    sardines    ice_crea       8
+      4         12.59         68.94        9.09       5.48       91.00       sardines & baguette ==> peppers & avocado    sardines & baguette    peppers & avocado      sardines    baguette    =======>    peppers     avocado        9
+      4         13.19         72.22        9.09       5.48       91.00       peppers & avocado ==> sardines & baguette    peppers & avocado      sardines & baguette    peppers     avocado     =======>    sardines    baguette      10
+      4         12.99         70.87        8.99       5.46       90.00       sardines & avocado ==> peppers & apples      sardines & avocado     peppers & apples       sardines    avocado     =======>    peppers     apples        11
+      4         12.69         69.23        8.99       5.46       90.00       peppers & apples ==> sardines & avocado      peppers & apples       sardines & avocado     peppers     apples      =======>    sardines    avocado       12
+      4         13.99         76.19        9.59       5.45       96.00       turkey & ice_crea ==> coke & bourbon         turkey & ice_crea      coke & bourbon         turkey      ice_crea    =======>    coke        bourbon       13
+      4         12.59         68.57        9.59       5.45       96.00       coke & bourbon ==> turkey & ice_crea         coke & bourbon         turkey & ice_crea      coke        bourbon     =======>    turkey      ice_crea      14
+      4         13.89         75.00        8.99       5.40       90.00       sardines & peppers ==> avocado & apples      sardines & peppers     avocado & apples       sardines    peppers     =======>    avocado     apples        15
+      4         11.99         64.75        8.99       5.40       90.00       avocado & apples ==> sardines & peppers      avocado & apples       sardines & peppers     avocado     apples      =======>    sardines    peppers       16
+      4         12.99         68.18        8.99       5.25       90.00       sardines & baguette ==> peppers & apples     sardines & baguette    peppers & apples       sardines    baguette    =======>    peppers     apples        17
+      4         13.19         69.23        8.99       5.25       90.00       peppers & apples ==> sardines & baguette     peppers & apples       sardines & baguette    peppers     apples      =======>    sardines    baguette      18
+      4         13.89         71.65        9.09       5.16       91.00       sardines & avocado ==> peppers & baguette    sardines & avocado     peppers & baguette     sardines    avocado     =======>    peppers     baguette      19
+      4         12.69         65.47        9.09       5.16       91.00       peppers & baguette ==> sardines & avocado    peppers & baguette     sardines & avocado     peppers     baguette    =======>    sardines    avocado       20
+      4         15.48         79.83        9.49       5.16       95.00       turkey & coke ==> olives & ice_crea          turkey & coke          olives & ice_crea      turkey      coke        =======>    olives      ice_crea      21
+      4         11.89         61.29        9.49       5.16       95.00       olives & ice_crea ==> turkey & coke          olives & ice_crea      turkey & coke          olives      ice_crea    =======>    turkey      coke          22
+      4         13.89         71.43        8.99       5.14       90.00       sardines & apples ==> peppers & baguette     sardines & apples      peppers & baguette     sardines    apples      =======>    peppers     baguette      23
+      4         12.59         64.75        8.99       5.14       90.00       peppers & baguette ==> sardines & apples     peppers & baguette     sardines & apples      peppers     baguette    =======>    sardines    apples        24
+      4         14.69         75.00        8.99       5.11       90.00       sardines & peppers ==> baguette & apples     sardines & peppers     baguette & apples      sardines    peppers     =======>    baguette    apples        25
+ 
+ 
+ 
+ 
+Rule Statistics
+ 
+The MEANS Procedure
+ 
+Variable    Label                          Minimum         Maximum            Mean
+----------------------------------------------------------------------------------
+EXP_CONF    Expected Confidence(%)       3.8961039      31.2687313      16.4985015
+CONF        Confidence(%)               12.1621622     100.0000000      65.7551323
+SUPPORT     Support(%)                   3.5964036      11.6883117      10.0299700
+LIFT        Lift                         3.1216216       5.6746032       4.0856300
+----------------------------------------------------------------------------------
+ 
+ 
+ 
+Sequence Report
+ 
+The FREQ Procedure
+ 
+                          Relations
+ 
+                                     Cumulative    Cumulative
+SET_SIZE    Frequency     Percent     Frequency      Percent
+-------------------------------------------------------------
+       4         200      100.00           200       100.00
+
+
+*------------------------------------------------------------*
+* Score Output
+*------------------------------------------------------------*
+
+
+*------------------------------------------------------------*
+* Report Output
+*------------------------------------------------------------*
